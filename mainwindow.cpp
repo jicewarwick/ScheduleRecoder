@@ -1,16 +1,27 @@
 #include "mainwindow.h"
 
 void MainWindow::_init_gui() {
-    this->resize(400, 500);
     _icon = new QIcon(":/icon.png");
     this->setWindowIcon(*_icon);
 
-    _tray_icon = new QSystemTrayIcon(*_icon, this);
     _tray_menu = new QMenu();
-    QAction* close_action = new QAction("Close", this);
+    _tray_menu->addAction(_ui.actionStart_Job);
+    _tray_menu->addAction(_ui.actionFinish_Job);
+    _tray_menu->addAction(_ui.action_Quit);
 
-    // connec to slots
-    connect(close_action, &QAction::triggered, [this](){_gonna_close = true; close();});
+    _tray_icon = new QSystemTrayIcon(*_icon, this);
+    _tray_icon->setContextMenu(_tray_menu);
+    _tray_icon->show();
+
+    _ui._records_view->setModel(_records_model);
+    _ui._records_view->hideColumn(0);
+    _ui._records_view->show();
+
+}
+
+void MainWindow::_create_connections() {
+    connect(_ui.action_Quit, &QAction::triggered,
+            this, &MainWindow::quit_win);
     connect(_tray_icon, &QSystemTrayIcon::activated, [this](auto reason){
         if (reason == QSystemTrayIcon::Trigger) {
             if (isVisible()) {
@@ -21,16 +32,6 @@ void MainWindow::_init_gui() {
             }
         }
     });
-
-    _tray_menu->addAction(close_action);
-
-    _tray_icon->setContextMenu(_tray_menu);
-    _tray_icon->show();
-
-    ui._records_view->setModel(_records_model);
-    ui._records_view->hideColumn(0);
-    ui._records_view->show();
-
 }
 
 
@@ -39,6 +40,16 @@ void MainWindow::start_job() {
 }
 
 void MainWindow::finish_job() {
+
+}
+
+void MainWindow::quit_win() {
+    _gonna_close = true;
+    this->close();
+
+}
+
+void MainWindow::activate_hide_window() {
 
 }
 
@@ -61,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     QCoreApplication::setOrganizationName("CJSoft");
     QCoreApplication::setOrganizationDomain("CJSoft.com");
     QCoreApplication::setApplicationName("ScheduleRecorder");
-    ui.setupUi(this);
+    _ui.setupUi(this);
 
     _init_db();
     _init_gui();

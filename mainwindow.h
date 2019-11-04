@@ -2,26 +2,19 @@
 #define MAINWINDOW_H
 
 #include <QCoreApplication>
-#include <QTabWidget>
 #include <QString>
 #include <QMainWindow>
 #include <QSystemTrayIcon>
-#include <QAction>
-#include <QMenuBar>
-#include <QMenu>
 #include <QSqlDatabase>
 #include <QSqlTableModel>
 #include <QCloseEvent>
-#include <QTableView>
 #include <QWidget>
 #include <QSettings>
-#include <QVBoxLayout>
 #include <QMessageBox>
-#include <QGroupBox>
 
 #include "ui_mainwindow.h"
 
-const QString DBLOC = "data.sqlite";
+const QString DBLOC = "./db.sqlite";
 
 
 class MainWindow : public QMainWindow {
@@ -35,7 +28,7 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private:
-    Ui::mainwindow ui;
+    Ui::mainwindow _ui;
 
     bool _gonna_close = false;
 
@@ -45,15 +38,20 @@ private:
     QMenu* _tray_menu;
 
     QSqlTableModel* _records_model;
-
     QSqlTableModel* _log;
 
     void _init_db();
     void _init_gui();
+    void _create_connections();
+
+signals:
+    void config_changed();
 
 private slots:
     void start_job();
     void finish_job();
+    void quit_win();
+    void activate_hide_window();
 
 };
 
