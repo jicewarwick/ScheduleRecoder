@@ -1,7 +1,5 @@
 <RCC>
     <qresource prefix="/">
         <file alias="icon.png">data/icon.png</file>
-        <file>favicon.ico</file>
-        <file>mainwindow.ui</file>
     </qresource>
 </RCC>

@@ -19,6 +19,8 @@
 #include <QMessageBox>
 #include <QGroupBox>
 
+#include "ui_mainwindow.h"
+
 const QString DBLOC = "data.sqlite";
 
 
@@ -33,38 +35,25 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private:
+    Ui::mainwindow ui;
+
     bool _gonna_close = false;
 
     QSettings _settings;
     QIcon* _icon;
     QSystemTrayIcon* _tray_icon;
     QMenu* _tray_menu;
-    QMenuBar* _menubar;
 
     QSqlTableModel* _records_model;
-    QTableView* _records_view;
 
     QSqlTableModel* _log;
-    QTableView* _log_view;
 
     void _init_db();
     void _init_gui();
-    void _create_menu();
 
 private slots:
     void start_job();
     void finish_job();
-
-};
-
-
-class StartJobMessageBox : public QWidget {
-    Q_OBJECT
-public:
-    StartJobMessageBox(){}
-    ~StartJobMessageBox(){}
-
-private:
 
 };
 

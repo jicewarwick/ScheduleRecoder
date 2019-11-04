@@ -17,6 +17,7 @@ add_executable(Schedule
   main.cpp
   mainwindow.cpp
   mainwindow.h
+  mainwindow.ui
   resources.qrc
 )
 
