@@ -1,38 +1,42 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QCloseEvent>
 #include <QCoreApplication>
-#include <QString>
 #include <QMainWindow>
-#include <QSystemTrayIcon>
+#include <QMessageBox>
+#include <QSettings>
 #include <QSqlDatabase>
 #include <QSqlTableModel>
-#include <QCloseEvent>
+#include <QString>
+#include <QSystemTrayIcon>
+#include <QTimer>
 #include <QWidget>
-#include <QSettings>
-#include <QMessageBox>
+#include <string>
 
 #include "ui_mainwindow.h"
-
-const QString DBLOC = "./db.sqlite";
-
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
-public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() override;
+   public:
+    MainWindow(QWidget* parent = nullptr);
+    ~MainWindow() override = default;
 
-protected:
-    void closeEvent(QCloseEvent *event) override;
+   protected:
+    void closeEvent(QCloseEvent* event) override;
 
-private:
+   private:
     Ui::mainwindow _ui;
 
-    bool _gonna_close = false;
+    bool _gonna_close = true;
+    bool _sound_effect;
+    int _poromodo_duration;
+    int _short_break_duration;
+    int _long_break_duration;
+    QString _db_loc;
 
-    QSettings _settings;
+    QSettings* _settings;
     QIcon* _icon;
     QSystemTrayIcon* _tray_icon;
     QMenu* _tray_menu;
@@ -40,19 +44,26 @@ private:
     QSqlTableModel* _records_model;
     QSqlTableModel* _log;
 
+    // functions
     void _init_db();
     void _init_gui();
     void _create_connections();
 
-signals:
-    void config_changed();
+    void _read_settings();
+    void _write_settings();
 
-private slots:
+   private slots:
+    // settings
+    void poromodo_duration_change(int);
+    void short_break_duration_change(int);
+    void long_break_duration_change(int);
+    void db_loc_change(QString);
+    void sound_effect_change(int);
+
     void start_job();
     void finish_job();
     void quit_win();
-    void activate_hide_window();
-
+    void activate_or_hide_window(QSystemTrayIcon::ActivationReason);
 };
 
-#endif // MAINWINDOW_H
+#endif	// MAINWINDOW_H

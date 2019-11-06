@@ -35,6 +35,124 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
+      <widget class="QWidget" name="widget">
+       <attribute name="title">
+        <string>Main</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <family>Times New Roman</family>
+            <pointsize>36</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>CurrentStatus</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="font">
+           <font>
+            <family>Times New Roman</family>
+            <pointsize>100</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>15:00</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QPushButton" name="pushButton">
+            <property name="text">
+             <string>Start</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_2">
+            <property name="text">
+             <string>Pause</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_3">
+            <property name="text">
+             <string>Stop</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="activity_label">
+            <property name="text">
+             <string>Activity:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="activity_combo">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Category:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="category_combo">
+            <property name="editable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Hashtags:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="hashtags_lineedit"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QTableView" name="tableView"/>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tab">
        <attribute name="title">
         <string>Records</string>
@@ -81,40 +199,17 @@
           </property>
           <layout class="QGridLayout" name="gridLayout">
            <item row="0" column="0">
-            <widget class="QLabel" name="label">
+            <widget class="QLabel" name="pomorodo_duration_label">
              <property name="text">
               <string>Poromodo Duration: 25min</string>
              </property>
              <property name="buddy">
-              <cstring>horizontalSlider</cstring>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QSlider" name="horizontalSlider">
-             <property name="maximum">
-              <number>60</number>
-             </property>
-             <property name="value">
-              <number>25</number>
-             </property>
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Short Beak Duration: 5min</string>
-             </property>
-             <property name="buddy">
-              <cstring>horizontalSlider_2</cstring>
+              <cstring>poromodo_duration_slider</cstring>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QSlider" name="horizontalSlider_2">
+            <widget class="QSlider" name="short_break_duration_slider">
              <property name="maximum">
               <number>30</number>
              </property>
@@ -126,23 +221,46 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>Long Break Duration: 15min</string>
-             </property>
-             <property name="buddy">
-              <cstring>horizontalSlider_3</cstring>
-             </property>
-            </widget>
-           </item>
            <item row="2" column="1">
-            <widget class="QSlider" name="horizontalSlider_3">
+            <widget class="QSlider" name="long_duration_slider">
              <property name="maximum">
               <number>60</number>
              </property>
              <property name="value">
               <number>15</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="short_break_duration_label">
+             <property name="text">
+              <string>Short Beak Duration: 5min</string>
+             </property>
+             <property name="buddy">
+              <cstring>short_break_duration_slider</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="long_break_duration_label">
+             <property name="text">
+              <string>Long Break Duration: 15min</string>
+             </property>
+             <property name="buddy">
+              <cstring>long_duration_slider</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QSlider" name="poromodo_duration_slider">
+             <property name="maximum">
+              <number>60</number>
+             </property>
+             <property name="value">
+              <number>25</number>
              </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -164,19 +282,19 @@
               <string>Database Location</string>
              </property>
              <property name="buddy">
-              <cstring>lineEdit</cstring>
+              <cstring>db_loc_lineedit</cstring>
              </property>
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="lineEdit">
+            <widget class="QLineEdit" name="db_loc_lineedit">
              <property name="text">
               <string>./db.sqlite</string>
              </property>
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QCheckBox" name="checkBox">
+            <widget class="QCheckBox" name="sound_effect_checkbox">
              <property name="text">
               <string>Sound Effects</string>
              </property>
@@ -213,7 +331,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>24</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuActions">
@@ -254,5 +372,93 @@
   </action>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>poromodo_duration_slider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>mainwindow</receiver>
+   <slot>poromodo_duration_change(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>352</x>
+     <y>81</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>354</x>
+     <y>-127</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>short_break_duration_slider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>mainwindow</receiver>
+   <slot>short_break_duration_change(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>295</x>
+     <y>107</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>291</x>
+     <y>-44</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>long_duration_slider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>mainwindow</receiver>
+   <slot>long_break_duration_change(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>240</x>
+     <y>135</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>245</x>
+     <y>-81</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>db_loc_lineedit</sender>
+   <signal>textChanged(QString)</signal>
+   <receiver>mainwindow</receiver>
+   <slot>db_loc_change(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>191</x>
+     <y>190</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>189</x>
+     <y>-37</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sound_effect_checkbox</sender>
+   <signal>stateChanged(int)</signal>
+   <receiver>mainwindow</receiver>
+   <slot>sound_effect_change(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>57</x>
+     <y>214</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>71</x>
+     <y>-87</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>poromodo_duration_change(int)</slot>
+  <slot>short_break_duration_change(int)</slot>
+  <slot>long_break_duration_change(int)</slot>
+  <slot>db_loc_change(QString)</slot>
+  <slot>sound_effect_change(int)</slot>
+ </slots>
 </ui>
