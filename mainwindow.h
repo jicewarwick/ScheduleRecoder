@@ -3,6 +3,7 @@
 
 #include <QCloseEvent>
 #include <QCoreApplication>
+#include <QDebug>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QSettings>
@@ -10,30 +11,27 @@
 #include <QSqlTableModel>
 #include <QString>
 #include <QSystemTrayIcon>
-#include <QTimer>
 #include <QWidget>
 #include <string>
 
 #include "ui_mainwindow.h"
+#include "poromodo.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
-   public:
+public:
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override = default;
 
-   protected:
+protected:
     void closeEvent(QCloseEvent* event) override;
 
-   private:
+private:
     Ui::mainwindow _ui;
 
-    bool _gonna_close = true;
+    bool _gonna_close = false;
     bool _sound_effect;
-    int _poromodo_duration;
-    int _short_break_duration;
-    int _long_break_duration;
     QString _db_loc;
 
     QSettings* _settings;
@@ -44,6 +42,8 @@ class MainWindow : public QMainWindow {
     QSqlTableModel* _records_model;
     QSqlTableModel* _log;
 
+    Poromodo* _poromodo;
+
     // functions
     void _init_db();
     void _init_gui();
@@ -52,13 +52,16 @@ class MainWindow : public QMainWindow {
     void _read_settings();
     void _write_settings();
 
-   private slots:
+
+private slots:
     // settings
     void poromodo_duration_change(int);
     void short_break_duration_change(int);
     void long_break_duration_change(int);
     void db_loc_change(QString);
     void sound_effect_change(int);
+
+    void pause_unpause_resp();
 
     void start_job();
     void finish_job();

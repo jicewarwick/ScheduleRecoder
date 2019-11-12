@@ -2,4 +2,5 @@
     <qresource prefix="/">
         <file alias="icon.png">data/icon.png</file>
     </qresource>
+    <qresource prefix="/sound"/>
 </RCC>

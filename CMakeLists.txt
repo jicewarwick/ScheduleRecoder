@@ -21,4 +21,7 @@ add_executable(Schedule
   resources.qrc
 )
 
-target_link_libraries(Schedule PRIVATE Qt5::Widgets Qt5::Sql)
+add_library(Poromodo poromodo.cpp poromodo.h)
+target_link_libraries(Poromodo PRIVATE Qt5::Core)
+
+target_link_libraries(Schedule PRIVATE Poromodo Qt5::Widgets Qt5::Sql)

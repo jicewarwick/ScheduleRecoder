@@ -57,44 +57,62 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label">
+         <widget class="QLCDNumber" name="lcdNumber">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="font">
            <font>
             <family>Times New Roman</family>
-            <pointsize>100</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
+            <pointsize>72</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
            </font>
           </property>
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
           </property>
-          <property name="text">
-           <string>15:00</string>
+          <property name="lineWidth">
+           <number>0</number>
           </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
+          <property name="smallDecimalPoint">
+           <bool>true</bool>
+          </property>
+          <property name="mode">
+           <enum>QLCDNumber::Dec</enum>
+          </property>
+          <property name="segmentStyle">
+           <enum>QLCDNumber::Flat</enum>
+          </property>
+          <property name="value" stdset="0">
+           <double>1234.000000000000000</double>
           </property>
          </widget>
         </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="start_buttom">
             <property name="text">
              <string>Start</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_2">
+           <widget class="QPushButton" name="pause_buttom">
             <property name="text">
              <string>Pause</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_3">
+           <widget class="QPushButton" name="stop_buttom">
             <property name="text">
              <string>Stop</string>
             </property>
@@ -338,36 +356,42 @@
     <property name="title">
      <string>Actions</string>
     </property>
-    <addaction name="actionStart_Job"/>
-    <addaction name="actionFinish_Job"/>
+    <addaction name="action_start"/>
+    <addaction name="action_pause"/>
+    <addaction name="action_stop"/>
     <addaction name="separator"/>
-    <addaction name="action_Quit"/>
+    <addaction name="action_quit"/>
    </widget>
    <addaction name="menuActions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionStart_Job">
+  <action name="action_start">
    <property name="text">
-    <string>Start Job</string>
+    <string>Start</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
    </property>
   </action>
-  <action name="actionFinish_Job">
+  <action name="action_stop">
    <property name="text">
-    <string>Finish Job</string>
+    <string>Stop</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
    </property>
   </action>
-  <action name="action_Quit">
+  <action name="action_quit">
    <property name="text">
     <string>&amp;Quit</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="action_pause">
+   <property name="text">
+    <string>Pause</string>
    </property>
   </action>
  </widget>
