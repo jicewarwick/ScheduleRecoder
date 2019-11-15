@@ -2,9 +2,8 @@
     <qresource prefix="/">
         <file alias="icon.png">data/icon.png</file>
     </qresource>
-    <qresource prefix="/sound">
+    <qresource prefix="/sounds">
         <file alias="bell.wav">data/sounds/bell.wav</file>
-        <file alias="birds.wav">data/sounds/birds.wav</file>
         <file alias="clock.wav">data/sounds/clock.wav</file>
         <file alias="loud-bell.wav">data/sounds/loud-bell.wav</file>
         <file alias="timer.wav">data/sounds/timer.wav</file>

@@ -7,6 +7,7 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QSettings>
+#include <QSound>
 #include <QSqlDatabase>
 #include <QSqlTableModel>
 #include <QString>
@@ -14,8 +15,8 @@
 #include <QWidget>
 #include <string>
 
-#include "ui_mainwindow.h"
 #include "poromodo.h"
+#include "ui_mainwindow.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -28,45 +29,46 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
-    Ui::mainwindow _ui;
+    Ui::mainwindow ui_;
 
-    bool _gonna_close = false;
-    bool _sound_effect;
-    QString _db_loc;
+    bool gonna_close_ = true;
+    bool sound_effect_;
+    QString db_loc_;
 
-    QSettings* _settings;
-    QIcon* _icon;
-    QSystemTrayIcon* _tray_icon;
-    QMenu* _tray_menu;
+    QSettings* settings_;
+    QIcon* icon_;
+    QSystemTrayIcon* tray_icon_;
+    QMenu* tray_menu_;
 
-    QSqlTableModel* _records_model;
-    QSqlTableModel* _log;
+    QSqlTableModel* records_model_;
+    QSqlTableModel* log_;
 
-    Poromodo* _poromodo;
+    Poromodo* poromodo_;
 
     // functions
-    void _init_db();
-    void _init_gui();
-    void _create_connections();
+    void InitDB();
+    void InitGUI();
+    void CreateConnections();
 
-    void _read_settings();
-    void _write_settings();
+    void ReadSettings();
+    void WriteSettings();
 
+    void PlaySound();
 
 private slots:
     // settings
-    void poromodo_duration_change(int);
-    void short_break_duration_change(int);
-    void long_break_duration_change(int);
-    void db_loc_change(QString);
-    void sound_effect_change(int);
+    void onPoromodoDurationChange(int);
+    void onShortBreakDurationChange(int);
+    void onLongBreakdurationChange(int);
+    void onDBLocationChange(QString);
+    void onSoundEffectStatusChange(int);
 
-    void pause_unpause_resp();
+    void onPuaseUnPause();
 
-    void start_job();
-    void finish_job();
-    void quit_win();
-    void activate_or_hide_window(QSystemTrayIcon::ActivationReason);
+    void onQuitWindow();
+    void onClickTray(QSystemTrayIcon::ActivationReason);
+
+    void onStatusChange(Poromodo::Status s);
 };
 
 #endif	// MAINWINDOW_H

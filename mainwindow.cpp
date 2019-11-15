@@ -7,27 +7,27 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     QCoreApplication::setOrganizationName("CJSoft");
     QCoreApplication::setOrganizationDomain("CJSoft.com");
     QCoreApplication::setApplicationName("ScheduleRecorder");
-    _ui.setupUi(this);
+    ui_.setupUi(this);
 
-    _poromodo = new Poromodo(this);
-    _read_settings();
-    _init_db();
-    _init_gui();
-    _create_connections();
+    poromodo_ = new Poromodo(this);
+    ReadSettings();
+    InitDB();
+    InitGUI();
+    CreateConnections();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// protected functions
 ////////////////////////////////////////////////////////////////////////////////
 void MainWindow::closeEvent(QCloseEvent* event) {
-    if (_gonna_close) {
+    if (gonna_close_) {
         qDebug() << "Really closing";
-        _write_settings();
+        WriteSettings();
         event->accept();
     } else {
         qDebug() << "Not really closing";
         this->hide();
-        _tray_icon->showMessage("Hiding", "Programe is hiding");
+        tray_icon_->showMessage("Hiding", "Programe is hiding");
         event->ignore();
     }
 }
@@ -35,154 +35,163 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 ////////////////////////////////////////////////////////////////////////////////
 /// private functions
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::_init_db() {
+void MainWindow::InitDB() {
     QSqlDatabase conn = QSqlDatabase::addDatabase("QSQLITE");
-    conn.setDatabaseName(_db_loc);
-    _records_model = new QSqlTableModel(this, conn);
-    _records_model->setTable("Records");
-    _log = new QSqlTableModel(this, conn);
+    conn.setDatabaseName(db_loc_);
+    if (!conn.open()) {
+        QMessageBox::critical(this, tr("Cannot open database"),
+                              tr("Unable to establish a database connection.\n"
+                                 "Click Cancel to exit."),
+                              QMessageBox::Cancel);
+        //        raise();
+    } else {
+        qDebug() << "Database conncected.";
+    }
+    records_model_ = new QSqlTableModel(this, conn);
+    records_model_->setTable("Records");
+    log_ = new QSqlTableModel(this, conn);
 
-    _records_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    _records_model->select();
-    _records_model->setHeaderData(0, Qt::Horizontal, tr("Start Time"));
-    _records_model->setHeaderData(1, Qt::Horizontal, tr("End Time"));
-    _records_model->setHeaderData(2, Qt::Horizontal, tr("Job"));
+    records_model_->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    records_model_->select();
+    //    _records_model->setHeaderData(0, Qt::Horizontal, tr("Start Time"));
+    //    _records_model->setHeaderData(1, Qt::Horizontal, tr("End Time"));
+    //    _records_model->setHeaderData(2, Qt::Horizontal, tr("Duration"));
+    //    _records_model->setHeaderData(3, Qt::Horizontal, tr("Category"));
+    //    _records_model->setHeaderData(4, Qt::Horizontal, tr("Job"));
+    //    _records_model->setHeaderData(5, Qt::Horizontal, tr("Hashtags"));
 }
 
-void MainWindow::_init_gui() {
+void MainWindow::InitGUI() {
     // new stuff
-    _icon = new QIcon(":/icon.png");
-    this->setWindowIcon(*_icon);
+    setWindowTitle(tr("Schedule"));
+    icon_ = new QIcon(":/icon.png");
+    this->setWindowIcon(*icon_);
 
-    _tray_menu = new QMenu();
-    _tray_menu->addAction(_ui.action_start);
-    _tray_menu->addAction(_ui.action_pause);
-    _tray_menu->addAction(_ui.action_stop);
-    _tray_menu->addAction(_ui.action_quit);
+    tray_menu_ = new QMenu();
+    tray_menu_->addAction(ui_.action_start);
+    tray_menu_->addAction(ui_.action_pause);
+    tray_menu_->addAction(ui_.action_stop);
+    tray_menu_->addAction(ui_.action_quit);
 
-    _tray_icon = new QSystemTrayIcon(*_icon, this);
-    _tray_icon->setContextMenu(_tray_menu);
-    _tray_icon->show();
+    tray_icon_ = new QSystemTrayIcon(*icon_, this);
+    tray_icon_->setContextMenu(tray_menu_);
+    tray_icon_->show();
 
-    _ui._records_view->setModel(_records_model);
-    _ui._records_view->hideColumn(0);
-    _ui._records_view->show();
+    ui_.records_view->setModel(records_model_);
+    ui_.records_view->hideColumn(0);
+    ui_.records_view->show();
+    ui_.records_view->resizeColumnsToContents();
 
     // existing stuff
-    _ui.db_loc_lineedit->setText(_db_loc);
-    _ui.sound_effect_checkbox->setChecked(_sound_effect);
-
-    //    _ui.lcdNumber->display(QString(_poromodo_duration) + QString(":00"));
+    ui_.lcdNumber->display("00:00");
+    ui_.db_loc_lineedit->setText(db_loc_);
+    ui_.sound_effect_checkbox->setChecked(sound_effect_);
 }
 
-void MainWindow::_create_connections() {
-    connect(_tray_icon, &QSystemTrayIcon::activated, this, &MainWindow::activate_or_hide_window);
-    connect(_ui.action_quit, &QAction::triggered, this, &MainWindow::quit_win);
-    connect(_ui.poromodo_duration_slider, &QSlider::valueChanged,
-            [=](int n) { _ui.long_duration_slider->setMaximum(n); });
-    connect(_ui.long_duration_slider, &QSlider::valueChanged, [this](int n) {
-        _ui.short_break_duration_slider->setMaximum(std::min(n, this->_ui.poromodo_duration_slider->value()));
+void MainWindow::CreateConnections() {
+    connect(tray_icon_, &QSystemTrayIcon::activated, this, &MainWindow::onClickTray);
+    connect(ui_.action_quit, &QAction::triggered, this, &MainWindow::onQuitWindow);
+    connect(ui_.poromodo_duration_slider, &QSlider::valueChanged,
+            [this](int n) { ui_.long_duration_slider->setMaximum(n); });
+    connect(ui_.long_duration_slider, &QSlider::valueChanged, [this](int n) {
+        ui_.short_break_duration_slider->setMaximum(std::min(n, this->ui_.poromodo_duration_slider->value()));
     });
 
-    connect(_ui.poromodo_duration_slider, &QSlider::valueChanged, _poromodo, &Poromodo::setPoromodoDurationMin);
-    connect(_ui.short_break_duration_slider, &QSlider::valueChanged, _poromodo, &Poromodo::setShortBreakDurationMin);
-    connect(_ui.long_duration_slider, &QSlider::valueChanged, _poromodo, &Poromodo::setLongBreakDurationMin);
-    connect(_poromodo, &Poromodo::TimeLeftStr, [this](QString s) { _ui.lcdNumber->display(s);});
+    connect(ui_.poromodo_duration_slider, &QSlider::valueChanged, poromodo_, &Poromodo::setPoromodoDurationMin);
+    connect(ui_.short_break_duration_slider, &QSlider::valueChanged, poromodo_, &Poromodo::setShortBreakDurationMin);
+    connect(ui_.long_duration_slider, &QSlider::valueChanged, poromodo_, &Poromodo::setLongBreakDurationMin);
+    connect(poromodo_, &Poromodo::TimeLeftStr, [this](QString s) { ui_.lcdNumber->display(s); });
 
-    connect(_ui.action_start, &QAction::triggered, _poromodo, &Poromodo::StartPoromodo);
-    connect(_ui.start_buttom, &QPushButton::pressed, _poromodo, &Poromodo::StartPoromodo);
-    connect(_ui.action_pause, &QAction::triggered, this, &MainWindow::pause_unpause_resp);
-    connect(_ui.pause_buttom, &QPushButton::pressed, this, &MainWindow::pause_unpause_resp);
-    connect(_ui.action_stop, &QAction::triggered, _poromodo, &Poromodo::Stop);
-    connect(_ui.stop_buttom, &QPushButton::pressed, _poromodo, &Poromodo::Stop);
+    connect(ui_.action_start, &QAction::triggered, poromodo_, &Poromodo::StartPoromodo);
+    connect(ui_.start_buttom, &QPushButton::pressed, poromodo_, &Poromodo::StartPoromodo);
+    connect(ui_.action_pause, &QAction::triggered, this, &MainWindow::onPuaseUnPause);
+    connect(ui_.pause_buttom, &QPushButton::pressed, this, &MainWindow::onPuaseUnPause);
+    connect(ui_.action_stop, &QAction::triggered, poromodo_, &Poromodo::Stop);
+    connect(ui_.stop_buttom, &QPushButton::pressed, poromodo_, &Poromodo::Stop);
 
+    connect(poromodo_, &Poromodo::StatusChanged, this, &MainWindow::onStatusChange);
 }
 
-void MainWindow::_read_settings() {
-    _settings = new QSettings();
-    int val = _settings->value("poromodo/poromodo_duration", 45).toInt();
-    _ui.poromodo_duration_slider->setValue(val);
-    _poromodo->setPoromodoDurationMin(val);
+void MainWindow::ReadSettings() {
+    settings_ = new QSettings();
+    int val = settings_->value("poromodo/poromodo_duration", 45).toInt();
+    ui_.poromodo_duration_slider->setValue(val);
+    poromodo_->setPoromodoDurationMin(val);
 
-    val = _settings->value("poromodo/short_break_duration", 5).toInt();
-    _ui.short_break_duration_slider->setValue(val);
-    _poromodo->setShortBreakDurationMin(val);
+    val = settings_->value("poromodo/short_break_duration", 5).toInt();
+    ui_.short_break_duration_slider->setValue(val);
+    poromodo_->setShortBreakDurationMin(val);
 
-    val = _settings->value("poromodo/long_break_duration", 15).toInt();
-    _ui.long_duration_slider->setValue(val);
-    _poromodo->setLongBreakDurationMin(val);
+    val = settings_->value("poromodo/long_break_duration", 15).toInt();
+    ui_.long_duration_slider->setValue(val);
+    poromodo_->setLongBreakDurationMin(val);
 
-    _sound_effect = (_settings->value("other/sound_effect", Qt::Checked).toInt() == Qt::Checked);
-    _db_loc = _settings->value("other/db_loc", "./db.sqlite").toString();
+    sound_effect_ = (settings_->value("other/sound_effect", Qt::Checked).toInt() == Qt::Checked);
+    db_loc_ = settings_->value("other/db_loc", "./db.sqlite").toString();
 }
 
-void MainWindow::_write_settings() {
-    _settings->setValue("poromodo/poromodo_duration", _ui.poromodo_duration_slider->value());
-    _settings->setValue("poromodo/short_break_duration", _ui.short_break_duration_slider->value());
-    _settings->setValue("poromodo/long_break_duration", _ui.long_duration_slider->value());
-    _settings->setValue("other/db_loc", _db_loc);
+void MainWindow::WriteSettings() {
+    settings_->setValue("poromodo/poromodo_duration", ui_.poromodo_duration_slider->value());
+    settings_->setValue("poromodo/short_break_duration", ui_.short_break_duration_slider->value());
+    settings_->setValue("poromodo/long_break_duration", ui_.long_duration_slider->value());
+    settings_->setValue("other/db_loc", db_loc_);
 
     int se;
-    _sound_effect ? se = Qt::Checked : se = Qt::Unchecked;
-    _settings->setValue("other/sound_effect", se);
+    sound_effect_ ? se = Qt::Checked : se = Qt::Unchecked;
+    settings_->setValue("other/sound_effect", se);
 
-    _settings->sync();
+    settings_->sync();
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 /// private slots
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::poromodo_duration_change(int n) {
+void MainWindow::onPoromodoDurationChange(int n) {
     QString text = QString::fromStdString("Poromodo Duration: " + std::to_string(n) + "min");
-    _ui.pomorodo_duration_label->setText(text);
-    _settings->setValue("poromodo/poromodo_duration", n);
+    ui_.pomorodo_duration_label->setText(text);
+    settings_->setValue("poromodo/poromodo_duration", n);
 }
 
-void MainWindow::short_break_duration_change(int n) {
+void MainWindow::onShortBreakDurationChange(int n) {
     QString text = QString::fromStdString("Short Break Duration: " + std::to_string(n) + "min");
-    _ui.short_break_duration_label->setText(text);
-    _settings->setValue("poromodo/short_break_duration", n);
+    ui_.short_break_duration_label->setText(text);
+    settings_->setValue("poromodo/short_break_duration", n);
 }
 
-void MainWindow::long_break_duration_change(int n) {
+void MainWindow::onLongBreakdurationChange(int n) {
     QString text = QString::fromStdString("Long Break Duration: " + std::to_string(n) + "min");
-    _ui.long_break_duration_label->setText(text);
-    _settings->setValue("poromodo/long_break_duration", n);
+    ui_.long_break_duration_label->setText(text);
+    settings_->setValue("poromodo/long_break_duration", n);
 }
 
-void MainWindow::db_loc_change(QString str) {
-    _db_loc = str;
-    _settings->setValue("other/db_loc", str);
+void MainWindow::onDBLocationChange(QString str) {
+    db_loc_ = str;
+    settings_->setValue("other/db_loc", str);
 }
 
-void MainWindow::sound_effect_change(int s) {
-    _sound_effect = (s == Qt::Checked);
-    _settings->setValue("other/sound_effect", s);
+void MainWindow::onSoundEffectStatusChange(int s) {
+    sound_effect_ = (s == Qt::Checked);
+    settings_->setValue("other/sound_effect", s);
 }
 
-void MainWindow::pause_unpause_resp() {
-    if (_ui.pause_buttom->text() == QString("Pause")) {
-        _ui.action_pause->setText("Unpause");
-        _ui.pause_buttom->setText("Unpause");
-        _poromodo->Pause();
+void MainWindow::onPuaseUnPause() {
+    if (ui_.pause_buttom->text() == QString("Pause")) {
+        ui_.action_pause->setText("Unpause");
+        ui_.pause_buttom->setText("Unpause");
+        poromodo_->Pause();
     } else {
-        _ui.action_pause->setText("Pause");
-        _ui.pause_buttom->setText("Pause");
-        _poromodo->Unpause();
+        ui_.action_pause->setText("Pause");
+        ui_.pause_buttom->setText("Pause");
+        poromodo_->Unpause();
     }
 }
 
-void MainWindow::start_job() {}
-
-void MainWindow::finish_job() {}
-
-void MainWindow::quit_win() {
-    _gonna_close = true;
+void MainWindow::onQuitWindow() {
+    gonna_close_ = true;
     close();
 }
 
-void MainWindow::activate_or_hide_window(QSystemTrayIcon::ActivationReason reason) {
+void MainWindow::onClickTray(QSystemTrayIcon::ActivationReason reason) {
     if (reason == QSystemTrayIcon::Trigger) {
         if (isVisible()) {
             hide();
@@ -191,4 +200,30 @@ void MainWindow::activate_or_hide_window(QSystemTrayIcon::ActivationReason reaso
             activateWindow();
         }
     }
+}
+
+void MainWindow::PlaySound() {
+    if (sound_effect_) {
+        QSound::play(":/sounds/loud-bell.wav");
+    }
+}
+
+void MainWindow::onStatusChange(Poromodo::Status s) {
+    switch (s) {
+        case Poromodo::Status::NONE:
+            ui_.status_label->setText(tr("READY"));
+            break;
+        case Poromodo::Status::POROMODO:
+            ui_.status_label->setText(tr("POROMODO"));
+            break;
+        case Poromodo::Status::SHORT_BREAK:
+            ui_.status_label->setText(tr("SHORT BREAK"));
+            break;
+        case Poromodo::Status::LONG_BREAK:
+            ui_.status_label->setText(tr("LONG BREAK"));
+            break;
+        case Poromodo::Status::PAUSE:
+            ui_.status_label->setText(ui_.status_label->text() + tr("(PAUSED)"));
+    }
+    PlaySound();
 }

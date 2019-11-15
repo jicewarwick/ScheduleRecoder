@@ -17,9 +17,10 @@ public:
 
     enum class Status { NONE, POROMODO, SHORT_BREAK, LONG_BREAK, PAUSE };
 
-    void setPoromodoDurationMin(int);
-    void setShortBreakDurationMin(int);
-    void setLongBreakDurationMin(int);
+    // setter
+    void setPoromodoDurationMin(int dur) { poromodo_dur_ = minutes(dur); }
+    void setShortBreakDurationMin(int dur) { short_break_dur_ = minutes(dur); }
+    void setLongBreakDurationMin(int dur) { long_break_dur_ = minutes(dur); }
 
 signals:
     void TimeLeftStr(QString);
@@ -35,16 +36,18 @@ public slots:
     void Stop();
 
 private:
-    minutes _poromodo_dur;
-    minutes _short_break_dur;
-    minutes _long_break_dur;
+    minutes poromodo_dur_;
+    minutes short_break_dur_;
+    minutes long_break_dur_;
 
-    Status _status = Status::NONE;
-    Status _pre_status = Status::NONE;
-    QTimer* _timer;
-    long long _time_left_sec;
+    Status status_ = Status::NONE;
+    Status pre_status_ = Status::NONE;
+    QTimer* timer_;
+    long long time_left_sec_;
+    const short kMaxPoomodoCount = 3;
+    short poromodo_count_ = 0;
 
-    void setStatus(Status s);
+    void set_status(Status s);
 
 private slots:
     void onTimeOut();

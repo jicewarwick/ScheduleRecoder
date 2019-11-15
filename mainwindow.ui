@@ -41,7 +41,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
-         <widget class="QLabel" name="label_2">
+         <widget class="QLabel" name="status_label">
           <property name="font">
            <font>
             <family>Times New Roman</family>
@@ -49,7 +49,7 @@
            </font>
           </property>
           <property name="text">
-           <string>CurrentStatus</string>
+           <string>Ready</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -91,7 +91,7 @@
            <enum>QLCDNumber::Flat</enum>
           </property>
           <property name="value" stdset="0">
-           <double>1234.000000000000000</double>
+           <double>0.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -167,7 +167,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QTableView" name="tableView"/>
+         <widget class="QTableView" name="log_view"/>
         </item>
        </layout>
       </widget>
@@ -198,7 +198,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QTableView" name="_records_view"/>
+            <widget class="QTableView" name="records_view"/>
            </item>
           </layout>
          </widget>
@@ -392,6 +392,9 @@
   <action name="action_pause">
    <property name="text">
     <string>Pause</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
  </widget>
