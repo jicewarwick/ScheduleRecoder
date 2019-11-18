@@ -36,7 +36,7 @@ signals:
     void StatusChanged(Status);
 
 public slots:
-    void StartPoromodo(QString, QString, QString);
+    void StartPoromodo(QString category, QString job, QString hashtags);
     void StartShortBreak();
     void StartLongBreak();
     void Pause();
@@ -58,7 +58,7 @@ private:
     QDateTime start_time_;
     QDateTime pause_start_time_;
 
-    seconds pause_duration_ = seconds(0);
+    long pause_duration_milliseconds_ = 0;
 
     QString category_;
     QString job_;
@@ -67,6 +67,7 @@ private:
     void set_status(Status s);
 
 private slots:
+    void StartPoromodo();
     void onTimeOut();
 };
 

@@ -37,7 +37,7 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 /// private functions
 ////////////////////////////////////////////////////////////////////////////////
 void MainWindow::InitDB() {
-    QSqlDatabase conn = QSqlDatabase::addDatabase("QSQLITE");
+    QSqlDatabase conn = QSqlDatabase::database();
     conn.setDatabaseName(kDBLoc);
     if (!conn.open()) {
         QMessageBox::critical(this, tr("Cannot open database"),
@@ -45,9 +45,8 @@ void MainWindow::InitDB() {
                                  "Click Cancel to exit."),
                               QMessageBox::Cancel);
         abort();
-    } else {
-        qDebug() << "Database conncected.";
     }
+
     records_model_ = new QSqlTableModel(this, conn);
     records_model_->setTable(kTableName);
     //    log_ = new QSqlTableModel(this, conn);
@@ -79,7 +78,7 @@ void MainWindow::InitGUI() {
     ui_.records_view->setModel(records_model_);
     ui_.records_view->hideColumn(0);
     ui_.records_view->show();
-    ui_.records_view->resizeColumnsToContents();
+//    ui_.records_view->resizeColumnsToContents();
 
     // existing stuff
     ui_.lcdNumber->display("00:00");
@@ -100,8 +99,8 @@ void MainWindow::CreateConnections() {
     connect(ui_.long_duration_slider, &QSlider::valueChanged, this, &MainWindow::onLongBreakdurationChange);
     connect(poromodo_, &Poromodo::TimeLeftStr, [this](QString s) { ui_.lcdNumber->display(s); });
 
-    connect(ui_.action_start, &QAction::triggered, poromodo_, &Poromodo::StartPoromodo);
-    connect(ui_.start_buttom, &QPushButton::pressed, poromodo_, &Poromodo::StartPoromodo);
+//    connect(ui_.action_start, &QAction::triggered, poromodo_, &Poromodo::StartPoromodo);
+    connect(ui_.start_buttom, &QPushButton::pressed, [this]() {poromodo_->StartPoromodo(ui_.category_combo->currentText(), ui_.activity_combo->currentText(), ui_.hashtags_lineedit->text());});
     connect(ui_.action_pause, &QAction::triggered, this, &MainWindow::onPuaseUnpause);
     connect(ui_.pause_buttom, &QPushButton::pressed, this, &MainWindow::onPuaseUnpause);
     connect(ui_.action_stop, &QAction::triggered, poromodo_, &Poromodo::Stop);

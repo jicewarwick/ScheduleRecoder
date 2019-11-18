@@ -28,15 +28,19 @@ Poromodo::Poromodo(int poromodo_dur_min, int short_break_dur_min, int long_break
 }
 
 void Poromodo::StartPoromodo(QString category, QString job, QString hashtags) {
+    category_ = category;
+    job_ = job;
+    hashtags_ = hashtags;
+
+    StartPoromodo();
+}
+
+void Poromodo::StartPoromodo() {
     if (status_ != Status::NONE) {
         Stop();
     }
     set_status(Status::POROMODO);
     qDebug() << "Start Poromodo";
-
-    category_ = category;
-    job_ = job;
-    hashtags_ = hashtags;
 
     start_time_ = QDateTime::currentDateTime();
     time_left_sec_ = duration_cast<seconds>(poromodo_dur_).count();
@@ -77,8 +81,7 @@ void Poromodo::Unpause() {
         set_status(pre_status_);
         timer_->start();
         auto pause_end_time = QDateTime::currentDateTime();
-        auto pause_duration = pause_end_time - pause_start_time_;
-        pause_duration += duration_cast<seconds>(pause_duration);
+        pause_duration_milliseconds_ += pause_start_time_.msecsTo(pause_end_time);
     }
 }
 
@@ -86,13 +89,32 @@ void Poromodo::Stop() {
     timer_->stop();
     set_status(Status::NONE);
     auto end_time = QDateTime::currentDateTime();
-    auto whole_duration = end_time - start_time_;
-    auto work_duration = whole_duration - pause_duration_;
+    long whole_duration_milliseconds = start_time_.msecsTo(end_time);
+    long work_duration = (whole_duration_milliseconds - pause_duration_milliseconds_) / 1000;
 
-    // append record to database
+    // todo: append record to database
+    auto db = QSqlDatabase::database();
+    QSqlQuery query(db);
+    query.prepare(
+        "INSERT INTO :database (start_time, end_time, duration, category, job, hashtags) "
+        "VALUES(:start_time, :end_time, :duration, :category, :job, :hashtags);");
+    query.bindValue(":database", kTableName);
+    query.bindValue(":start_time", start_time_.toString(Qt::DateFormat::ISODate));
+    query.bindValue(":end_time", end_time.toString(Qt::DateFormat::ISODate));
+    query.bindValue(":duration", int(work_duration));
+    query.bindValue(":category", category_);
+    query.bindValue(":job", job_);
+    query.bindValue(":hashtags", hashtags_);
+    bool query_status = query.exec();
+    if (query_status) {
+        qDebug() << "Entry inserted successfully!";
+    } else {
+        qDebug() << "Data insersion failed!";
+    }
+    db.commit();
 
     // clean up
-    pause_duration_ = seconds(0);
+    pause_duration_milliseconds_ = 0;
 }
 
 void Poromodo::set_status(Poromodo::Status s) {
