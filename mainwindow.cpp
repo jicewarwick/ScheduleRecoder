@@ -10,10 +10,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     ui_.setupUi(this);
 
     poromodo_ = new Poromodo(this);
-    ReadSettings();
     InitDB();
     InitGUI();
     CreateConnections();
+    ReadSettings();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 void MainWindow::closeEvent(QCloseEvent* event) {
     if (gonna_close_) {
         qDebug() << "Really closing";
+        poromodo_->Stop();
         WriteSettings();
         event->accept();
     } else {
@@ -37,28 +38,26 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 ////////////////////////////////////////////////////////////////////////////////
 void MainWindow::InitDB() {
     QSqlDatabase conn = QSqlDatabase::addDatabase("QSQLITE");
-    conn.setDatabaseName(db_loc_);
+    conn.setDatabaseName(kDBLoc);
     if (!conn.open()) {
         QMessageBox::critical(this, tr("Cannot open database"),
                               tr("Unable to establish a database connection.\n"
                                  "Click Cancel to exit."),
                               QMessageBox::Cancel);
-        //        raise();
+        abort();
     } else {
         qDebug() << "Database conncected.";
     }
     records_model_ = new QSqlTableModel(this, conn);
-    records_model_->setTable("Records");
-    log_ = new QSqlTableModel(this, conn);
+    records_model_->setTable(kTableName);
+    //    log_ = new QSqlTableModel(this, conn);
 
     records_model_->setEditStrategy(QSqlTableModel::OnManualSubmit);
     records_model_->select();
-    //    _records_model->setHeaderData(0, Qt::Horizontal, tr("Start Time"));
-    //    _records_model->setHeaderData(1, Qt::Horizontal, tr("End Time"));
-    //    _records_model->setHeaderData(2, Qt::Horizontal, tr("Duration"));
-    //    _records_model->setHeaderData(3, Qt::Horizontal, tr("Category"));
-    //    _records_model->setHeaderData(4, Qt::Horizontal, tr("Job"));
-    //    _records_model->setHeaderData(5, Qt::Horizontal, tr("Hashtags"));
+    vector<string> header{"ID", "Start Time", "End Time", "Duration", "Category", "Job", "Hashtags"};
+    for (size_t i = 0; i < header.size(); ++i) {
+        records_model_->setHeaderData(int(i), Qt::Horizontal, tr(header[i].c_str()));
+    }
 }
 
 void MainWindow::InitGUI() {
@@ -84,7 +83,6 @@ void MainWindow::InitGUI() {
 
     // existing stuff
     ui_.lcdNumber->display("00:00");
-    ui_.db_loc_lineedit->setText(db_loc_);
     ui_.sound_effect_checkbox->setChecked(sound_effect_);
 }
 
@@ -97,15 +95,15 @@ void MainWindow::CreateConnections() {
         ui_.short_break_duration_slider->setMaximum(std::min(n, this->ui_.poromodo_duration_slider->value()));
     });
 
-    connect(ui_.poromodo_duration_slider, &QSlider::valueChanged, poromodo_, &Poromodo::setPoromodoDurationMin);
-    connect(ui_.short_break_duration_slider, &QSlider::valueChanged, poromodo_, &Poromodo::setShortBreakDurationMin);
-    connect(ui_.long_duration_slider, &QSlider::valueChanged, poromodo_, &Poromodo::setLongBreakDurationMin);
+    connect(ui_.poromodo_duration_slider, &QSlider::valueChanged, this, &MainWindow::onPoromodoDurationChange);
+    connect(ui_.short_break_duration_slider, &QSlider::valueChanged, this, &MainWindow::onShortBreakDurationChange);
+    connect(ui_.long_duration_slider, &QSlider::valueChanged, this, &MainWindow::onLongBreakdurationChange);
     connect(poromodo_, &Poromodo::TimeLeftStr, [this](QString s) { ui_.lcdNumber->display(s); });
 
     connect(ui_.action_start, &QAction::triggered, poromodo_, &Poromodo::StartPoromodo);
     connect(ui_.start_buttom, &QPushButton::pressed, poromodo_, &Poromodo::StartPoromodo);
-    connect(ui_.action_pause, &QAction::triggered, this, &MainWindow::onPuaseUnPause);
-    connect(ui_.pause_buttom, &QPushButton::pressed, this, &MainWindow::onPuaseUnPause);
+    connect(ui_.action_pause, &QAction::triggered, this, &MainWindow::onPuaseUnpause);
+    connect(ui_.pause_buttom, &QPushButton::pressed, this, &MainWindow::onPuaseUnpause);
     connect(ui_.action_stop, &QAction::triggered, poromodo_, &Poromodo::Stop);
     connect(ui_.stop_buttom, &QPushButton::pressed, poromodo_, &Poromodo::Stop);
 
@@ -127,14 +125,12 @@ void MainWindow::ReadSettings() {
     poromodo_->setLongBreakDurationMin(val);
 
     sound_effect_ = (settings_->value("other/sound_effect", Qt::Checked).toInt() == Qt::Checked);
-    db_loc_ = settings_->value("other/db_loc", "./db.sqlite").toString();
 }
 
 void MainWindow::WriteSettings() {
     settings_->setValue("poromodo/poromodo_duration", ui_.poromodo_duration_slider->value());
     settings_->setValue("poromodo/short_break_duration", ui_.short_break_duration_slider->value());
     settings_->setValue("poromodo/long_break_duration", ui_.long_duration_slider->value());
-    settings_->setValue("other/db_loc", db_loc_);
 
     int se;
     sound_effect_ ? se = Qt::Checked : se = Qt::Unchecked;
@@ -150,23 +146,21 @@ void MainWindow::onPoromodoDurationChange(int n) {
     QString text = QString::fromStdString("Poromodo Duration: " + std::to_string(n) + "min");
     ui_.pomorodo_duration_label->setText(text);
     settings_->setValue("poromodo/poromodo_duration", n);
+    poromodo_->setPoromodoDurationMin(n);
 }
 
 void MainWindow::onShortBreakDurationChange(int n) {
     QString text = QString::fromStdString("Short Break Duration: " + std::to_string(n) + "min");
     ui_.short_break_duration_label->setText(text);
     settings_->setValue("poromodo/short_break_duration", n);
+    poromodo_->setShortBreakDurationMin(n);
 }
 
 void MainWindow::onLongBreakdurationChange(int n) {
     QString text = QString::fromStdString("Long Break Duration: " + std::to_string(n) + "min");
     ui_.long_break_duration_label->setText(text);
     settings_->setValue("poromodo/long_break_duration", n);
-}
-
-void MainWindow::onDBLocationChange(QString str) {
-    db_loc_ = str;
-    settings_->setValue("other/db_loc", str);
+    poromodo_->setLongBreakDurationMin(n);
 }
 
 void MainWindow::onSoundEffectStatusChange(int s) {
@@ -174,7 +168,7 @@ void MainWindow::onSoundEffectStatusChange(int s) {
     settings_->setValue("other/sound_effect", s);
 }
 
-void MainWindow::onPuaseUnPause() {
+void MainWindow::onPuaseUnpause() {
     if (ui_.pause_buttom->text() == QString("Pause")) {
         ui_.action_pause->setText("Unpause");
         ui_.pause_buttom->setText("Unpause");

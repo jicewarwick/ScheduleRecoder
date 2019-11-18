@@ -3,6 +3,21 @@
 Poromodo::Poromodo(QObject* parent) : QObject(parent) {
     timer_ = new QTimer(this);
     connect(timer_, &QTimer::timeout, this, &Poromodo::onTimeOut);
+    QSqlDatabase conn = QSqlDatabase::addDatabase("QSQLITE");
+    conn.setDatabaseName(kDBLoc);
+    if (!conn.open()) {
+        throw runtime_error("Cannot connect to database.");
+    } else {
+        qDebug() << "Database conncected.";
+        QStringList tables = conn.tables();
+        if (!tables.contains(kTableName)) {
+            qDebug() << "Database does not contain table " << kTableName << ", Creating Manually.";
+            QSqlQuery query;
+            query.exec(
+                "CREATE TABLE Records (`id` INTEGER, `start_time` DATETIME, `end_time` DATETIME, `duration` INTEGER, "
+                "`category` TEXT, `job` TEXT, `hashtags` TEXT)");
+        }
+    }
 }
 
 Poromodo::Poromodo(int poromodo_dur_min, int short_break_dur_min, int long_break_dur_min, QObject* parent)
@@ -12,12 +27,18 @@ Poromodo::Poromodo(int poromodo_dur_min, int short_break_dur_min, int long_break
     long_break_dur_ = minutes(long_break_dur_min);
 }
 
-void Poromodo::StartPoromodo() {
+void Poromodo::StartPoromodo(QString category, QString job, QString hashtags) {
     if (status_ != Status::NONE) {
         Stop();
     }
     set_status(Status::POROMODO);
     qDebug() << "Start Poromodo";
+
+    category_ = category;
+    job_ = job;
+    hashtags_ = hashtags;
+
+    start_time_ = QDateTime::currentDateTime();
     time_left_sec_ = duration_cast<seconds>(poromodo_dur_).count();
     timer_->start(milliseconds(1000));
 }
@@ -47,6 +68,7 @@ void Poromodo::Pause() {
         timer_->stop();
         pre_status_ = status_;
         set_status(Status::PAUSE);
+        pause_start_time_ = QDateTime::currentDateTime();
     }
 }
 
@@ -54,12 +76,23 @@ void Poromodo::Unpause() {
     if (status_ == Status::PAUSE) {
         set_status(pre_status_);
         timer_->start();
+        auto pause_end_time = QDateTime::currentDateTime();
+        auto pause_duration = pause_end_time - pause_start_time_;
+        pause_duration += duration_cast<seconds>(pause_duration);
     }
 }
 
 void Poromodo::Stop() {
     timer_->stop();
     set_status(Status::NONE);
+    auto end_time = QDateTime::currentDateTime();
+    auto whole_duration = end_time - start_time_;
+    auto work_duration = whole_duration - pause_duration_;
+
+    // append record to database
+
+    // clean up
+    pause_duration_ = seconds(0);
 }
 
 void Poromodo::set_status(Poromodo::Status s) {

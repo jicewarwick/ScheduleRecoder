@@ -22,6 +22,6 @@ add_executable(Schedule
 )
 
 add_library(Poromodo poromodo.cpp poromodo.h)
-target_link_libraries(Poromodo PRIVATE Qt5::Core)
+target_link_libraries(Poromodo PRIVATE Qt5::Core Qt5::Sql)
 
 target_link_libraries(Schedule PRIVATE Poromodo Qt5::Widgets Qt5::Sql Qt5::Multimedia)

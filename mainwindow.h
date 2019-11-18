@@ -14,9 +14,13 @@
 #include <QSystemTrayIcon>
 #include <QWidget>
 #include <string>
+#include <vector>
 
 #include "poromodo.h"
 #include "ui_mainwindow.h"
+
+using std::string;
+using std::vector;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -33,7 +37,6 @@ private:
 
     bool gonna_close_ = true;
     bool sound_effect_;
-    QString db_loc_;
 
     QSettings* settings_;
     QIcon* icon_;
@@ -60,10 +63,9 @@ private slots:
     void onPoromodoDurationChange(int);
     void onShortBreakDurationChange(int);
     void onLongBreakdurationChange(int);
-    void onDBLocationChange(QString);
     void onSoundEffectStatusChange(int);
 
-    void onPuaseUnPause();
+    void onPuaseUnpause();
 
     void onQuitWindow();
     void onClickTray(QSystemTrayIcon::ActivationReason);

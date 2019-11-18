@@ -3,10 +3,18 @@
 
 #include <QDebug>
 #include <QObject>
+#include <QSqlDatabase>
+#include <QSqlQuery>
 #include <QTimer>
-#include <chrono>
+#include <QDateTime>
+#include <stdexcept>
 
 using namespace std::chrono;
+using std::runtime_error;
+using std::tuple;
+
+const QString kDBLoc = "./db.sqlite";
+const QString kTableName = "Records";
 
 class Poromodo : public QObject {
     Q_OBJECT
@@ -28,7 +36,7 @@ signals:
     void StatusChanged(Status);
 
 public slots:
-    void StartPoromodo();
+    void StartPoromodo(QString, QString, QString);
     void StartShortBreak();
     void StartLongBreak();
     void Pause();
@@ -46,6 +54,15 @@ private:
     long long time_left_sec_;
     const short kMaxPoomodoCount = 3;
     short poromodo_count_ = 0;
+
+    QDateTime start_time_;
+    QDateTime pause_start_time_;
+
+    seconds pause_duration_ = seconds(0);
+
+    QString category_;
+    QString job_;
+    QString hashtags_;
 
     void set_status(Status s);
 
