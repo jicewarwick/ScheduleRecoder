@@ -1,17 +1,21 @@
 #ifndef POROMODO_H
 #define POROMODO_H
 
+#include <QDateTime>
 #include <QDebug>
 #include <QObject>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QStringList>
 #include <QTimer>
-#include <QDateTime>
+#include <set>
 #include <stdexcept>
+#include <string>
 
 using namespace std::chrono;
 using std::runtime_error;
-using std::tuple;
+using std::set;
+using std::string;
 
 const QString kDBLoc = "./db.sqlite";
 const QString kTableName = "Records";
@@ -30,18 +34,27 @@ public:
     void setShortBreakDurationMin(int dur) { short_break_dur_ = minutes(dur); }
     void setLongBreakDurationMin(int dur) { long_break_dur_ = minutes(dur); }
 
+    // db queryer
+    QStringList getAllCategories();
+    QStringList getAllActivities();
+    QStringList getAllHashtags();
+
 signals:
     void TimeLeftStr(QString);
     void TimeLeft(seconds);
     void StatusChanged(Status);
 
 public slots:
-    void StartPoromodo(QString category, QString job, QString hashtags);
+    void StartPoromodo(QString category, QString activity, QString hashtags);
     void StartShortBreak();
     void StartLongBreak();
     void Pause();
     void Unpause();
     void Stop();
+
+private slots:
+    void StartPoromodo();
+    void onTimeOut();
 
 private:
     minutes poromodo_dur_;
@@ -55,20 +68,18 @@ private:
     const short kMaxPoomodoCount = 3;
     short poromodo_count_ = 0;
 
+    long pause_duration_milliseconds_ = 0;
+
     QDateTime start_time_;
     QDateTime pause_start_time_;
 
-    long pause_duration_milliseconds_ = 0;
-
     QString category_;
-    QString job_;
+    QString activity_;
     QString hashtags_;
 
     void set_status(Status s);
-
-private slots:
-    void StartPoromodo();
-    void onTimeOut();
+    set<QString> QueryDatabaseColumn(QString column);
+    QStringList SetToQStringList(set<QString> input);
 };
 
 #endif	// POROMODO_H

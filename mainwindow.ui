@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>830</width>
     <height>600</height>
    </rect>
   </property>
@@ -124,6 +124,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QLabel" name="activity_label">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string>Activity:</string>
             </property>
@@ -131,6 +137,12 @@
           </item>
           <item>
            <widget class="QComboBox" name="activity_combo">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="editable">
              <bool>true</bool>
             </property>
@@ -138,6 +150,12 @@
           </item>
           <item>
            <widget class="QLabel" name="label_5">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string>Category:</string>
             </property>
@@ -145,6 +163,12 @@
           </item>
           <item>
            <widget class="QComboBox" name="category_combo">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="editable">
              <bool>true</bool>
             </property>
@@ -331,8 +355,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>24</height>
+     <width>830</width>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuActions">
