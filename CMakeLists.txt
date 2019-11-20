@@ -17,7 +17,10 @@ endif()
 
 find_package(Qt5 COMPONENTS Widgets Sql Multimedia LinguistTools REQUIRED)
 
-qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR})
+set(TS_FILES ${CMAKE_SOURCE_DIR}/translations/main_cn.ts)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/translations)
+set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION "translations")
+qt5_add_translation(QM_FILES ${TS_FILES})
 
 add_executable(Schedule
   main.cpp
@@ -33,3 +36,4 @@ target_link_libraries(Poromodo PRIVATE Qt5::Core Qt5::Sql)
 
 target_link_libraries(Schedule PRIVATE Poromodo Qt5::Widgets Qt5::Sql Qt5::Multimedia)
 
+install(FILES ${QM_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/translations)

@@ -41,15 +41,14 @@ private slots:
     void onPoromodoDurationChange(int);
     void onShortBreakDurationChange(int);
     void onLongBreakdurationChange(int);
-    void onSoundEffectStatusChange(int);
-
-    void onPuaseUnpause();
 
     void onQuitWindow();
     void onClickTray(QSystemTrayIcon::ActivationReason);
 
     void onStatusChange(Poromodo::Status s);
-    void StartPorodomoPorcess();
+    void onStartPorodomoPorcess();
+    void onPuaseUnpause();
+    void onStopPorodomoPorcess();
 
 private:
     Ui::mainwindow ui_;

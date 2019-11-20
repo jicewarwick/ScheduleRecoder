@@ -46,14 +46,11 @@ signals:
 
 public slots:
     void StartPoromodo(QString category, QString activity, QString hashtags);
-    void StartShortBreak();
-    void StartLongBreak();
     void Pause();
     void Unpause();
     void Stop();
 
 private slots:
-    void StartPoromodo();
     void onTimeOut();
 
 private:
@@ -77,9 +74,14 @@ private:
     QString activity_;
     QString hashtags_;
 
+    void StartPoromodo();
+    void StartShortBreak();
+    void StartLongBreak();
+
     void set_status(Status s);
     set<QString> QueryDatabaseColumn(QString column);
     QStringList SetToQStringList(set<QString> input);
+    void InsertRecords();
 };
 
 #endif	// POROMODO_H
