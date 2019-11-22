@@ -42,7 +42,8 @@ public:
 signals:
     void TimeLeftStr(QString);
     void TimeLeft(seconds);
-    void StatusChanged(Status);
+    void StatusChangedAuto(Status);
+    void StatusChangedManual(Status);
 
 public slots:
     void StartPoromodo(QString category, QString activity, QString hashtags);
@@ -78,7 +79,8 @@ private:
     void StartShortBreak();
     void StartLongBreak();
 
-    void set_status(Status s);
+    void set_status_auto(Status s);
+    void set_status_mannual(Status s);
     set<QString> QueryDatabaseColumn(QString column);
     QStringList SetToQStringList(set<QString> input);
     void InsertRecords();

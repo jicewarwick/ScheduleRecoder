@@ -52,6 +52,8 @@ void Poromodo::StartPoromodo(QString category, QString activity, QString hashtag
     hashtags_ = hashtags;
 
     start_time_ = QDateTime::currentDateTime();
+    set_status_mannual(Status::POROMODO);
+    qDebug() << "Start Poromodo";
     StartPoromodo();
 }
 
@@ -59,14 +61,14 @@ void Poromodo::Pause() {
     if (status_ != Status::NONE) {
         timer_->stop();
         pre_status_ = status_;
-        set_status(Status::PAUSE);
+        set_status_mannual(Status::PAUSE);
         pause_start_time_ = QDateTime::currentDateTime();
     }
 }
 
 void Poromodo::Unpause() {
     if (status_ == Status::PAUSE) {
-        set_status(pre_status_);
+        set_status_mannual(pre_status_);
         timer_->start();
         auto pause_end_time = QDateTime::currentDateTime();
         pause_duration_milliseconds_ += pause_start_time_.msecsTo(pause_end_time);
@@ -76,7 +78,7 @@ void Poromodo::Unpause() {
 void Poromodo::Stop() {
     timer_->stop();
     if (status_ != Status::NONE) {
-        set_status(Status::NONE);
+        set_status_mannual(Status::NONE);
         InsertRecords();
     }
 }
@@ -85,31 +87,35 @@ void Poromodo::Stop() {
 /// private functions
 ////////////////////////////////////////////////////////////////////////////////
 void Poromodo::StartPoromodo() {
-    set_status(Status::POROMODO);
-    qDebug() << "Start Poromodo";
-
     time_left_sec_ = duration_cast<seconds>(poromodo_dur_).count();
     timer_->start(milliseconds(1000));
 }
 
 void Poromodo::StartShortBreak() {
     qDebug() << "Start Short Break";
-    set_status(Status::SHORT_BREAK);
+    set_status_auto(Status::SHORT_BREAK);
     time_left_sec_ = duration_cast<seconds>(short_break_dur_).count();
     timer_->start(milliseconds(1000));
 }
 
 void Poromodo::StartLongBreak() {
     qDebug() << "Start Long Break";
-    set_status(Status::LONG_BREAK);
+    set_status_auto(Status::LONG_BREAK);
     time_left_sec_ = duration_cast<seconds>(long_break_dur_).count();
     timer_->start(milliseconds(1000));
 }
 
-void Poromodo::set_status(Poromodo::Status s) {
+void Poromodo::set_status_auto(Poromodo::Status s) {
     if (s != status_) {
         status_ = s;
-        emit StatusChanged(s);
+        emit StatusChangedAuto(s);
+    }
+}
+
+void Poromodo::set_status_mannual(Poromodo::Status s) {
+    if (s != status_) {
+        status_ = s;
+        emit StatusChangedManual(s);
     }
 }
 
@@ -153,6 +159,8 @@ void Poromodo::onTimeOut() {
                 StartShortBreak();
             }
         } else {
+            set_status_auto(Status::POROMODO);
+            qDebug() << "Start Poromodo";
             StartPoromodo();
         }
     }

@@ -15,6 +15,7 @@
 #include <QStringList>
 #include <QSystemTrayIcon>
 #include <QWidget>
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
@@ -22,6 +23,7 @@
 #include "poromodo.h"
 #include "ui_mainwindow.h"
 
+using std::map;
 using std::set;
 using std::string;
 using std::vector;
@@ -49,15 +51,22 @@ private slots:
     void onStartPorodomoPorcess();
     void onPuaseUnpause();
     void onStopPorodomoPorcess();
+    void onStatusChangedNotification(Poromodo::Status s);
 
 private:
     Ui::mainwindow ui_;
 
-    bool gonna_close_ = true;
-    bool sound_effect_;
+    bool gonna_close_ = false;
 
+    // settings
+    bool sound_effect_;
+    bool popup_messagebox_;
+    bool tray_popup_;
     QSettings* settings_;
-    QIcon* icon_;
+
+    const QIcon* title_icon_ = new QIcon(":/icons/icon.png");
+    const QIcon* start_icon_ = new QIcon(":/icons/start.png");
+    const QIcon* pause_icon_ = new QIcon(":/icons/pause.png");
     QSystemTrayIcon* tray_icon_;
     QMenu* tray_menu_;
 
@@ -71,6 +80,12 @@ private:
     QStringList hashtags_;
     QCompleter* hashtag_completer_;
 
+    const map<Poromodo::Status, QString> StatusInfo = {{Poromodo::Status::NONE, tr("READY")},
+                                                       {Poromodo::Status::POROMODO, tr("POROMODO")},
+                                                       {Poromodo::Status::SHORT_BREAK, tr("SHORT BREAK")},
+                                                       {Poromodo::Status::LONG_BREAK, tr("LONG BREAK")},
+                                                       {Poromodo::Status::PAUSE, tr("(PAUSED)")}};
+
     // functions
     void InitDB();
     void InitGUI();
@@ -78,8 +93,6 @@ private:
 
     void ReadSettings();
     void WriteSettings();
-
-    void PlaySound();
 };
 
 #endif	// MAINWINDOW_H

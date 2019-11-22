@@ -26,7 +26,7 @@ void MainWindow::closeEvent(QCloseEvent* event) {
         WriteSettings();
         event->accept();
     } else {
-        qDebug() << "Not really closing";
+        qDebug() << "Hide to tray";
         this->hide();
         tray_icon_->showMessage(tr("Minimized to Tray"), tr("Working in background!"));
         event->ignore();
@@ -57,11 +57,15 @@ void MainWindow::onLongBreakdurationChange(int n) {
 void MainWindow::onPuaseUnpause() {
     if (ui_.pause_buttom->text() == tr("Pause")) {
         ui_.action_pause->setText(tr("Unpause"));
+        ui_.action_pause->setIcon(*start_icon_);
         ui_.pause_buttom->setText(tr("Unpause"));
+        ui_.pause_buttom->setIcon(*start_icon_);
         poromodo_->Pause();
     } else {
         ui_.action_pause->setText(tr("Pause"));
+        ui_.action_pause->setIcon(*pause_icon_);
         ui_.pause_buttom->setText(tr("Pause"));
+        ui_.pause_buttom->setIcon(*pause_icon_);
         poromodo_->Unpause();
     }
 }
@@ -83,26 +87,17 @@ void MainWindow::onClickTray(QSystemTrayIcon::ActivationReason reason) {
 }
 
 void MainWindow::onStatusChange(Poromodo::Status s) {
+    QString status_info = StatusInfo.at(s);
     switch (s) {
-        case Poromodo::Status::NONE:
-            ui_.status_label->setText(tr("READY"));
-            break;
-        case Poromodo::Status::POROMODO:
-            ui_.status_label->setText(tr("POROMODO"));
-            tray_icon_->showMessage(tr("POROMODO"), tr("POROMODO"));
-            break;
-        case Poromodo::Status::SHORT_BREAK:
-            ui_.status_label->setText(tr("SHORT BREAK"));
-            tray_icon_->showMessage(tr("SHORT BREAK"), tr("SHORT BREAK"));
-            break;
-        case Poromodo::Status::LONG_BREAK:
-            ui_.status_label->setText(tr("LONG BREAK"));
-            tray_icon_->showMessage(tr("LONG BREAK"), tr("LONG BREAK"));
-            break;
         case Poromodo::Status::PAUSE:
-            ui_.status_label->setText(ui_.status_label->text() + tr("(PAUSED)"));
+            ui_.status_label->setText(ui_.status_label->text() + status_info);
+            break;
+        case Poromodo::Status::NONE:
+            ui_.status_label->setText(status_info);
+            break;
+        default:
+            ui_.status_label->setText(status_info);
     }
-    PlaySound();
 }
 
 void MainWindow::onStartPorodomoPorcess() {
@@ -116,16 +111,16 @@ void MainWindow::onStartPorodomoPorcess() {
     }
     poromodo_->StartPoromodo(new_category, new_activity, new_hashtag);
 
-    if (activities_.count(new_activity) != 0) {
+    if (!activities_.contains(new_activity)) {
         activities_ << new_activity;
         ui_.activity_combo->insertItem(0, new_activity);
     }
-    if (categories_.count(new_category) != 0) {
+    if (!categories_.contains(new_category)) {
         categories_ << new_category;
         ui_.category_combo->insertItem(0, new_category);
     }
     for (QString it : new_hashtag.split(" ")) {
-        if (hashtags_.count(it) != 0) {
+        if (!hashtags_.contains(it)) {
             hashtags_ << it;
         }
     }
@@ -186,16 +181,15 @@ void MainWindow::InitDB() {
 void MainWindow::InitGUI() {
     // new stuff
     setWindowTitle(tr("Schedule"));
-    icon_ = new QIcon(":/icon.png");
-    this->setWindowIcon(*icon_);
+    this->setWindowIcon(*title_icon_);
 
-    tray_menu_ = new QMenu();
-    tray_menu_->addAction(ui_.action_start);
+    tray_menu_ = new QMenu(this);
     tray_menu_->addAction(ui_.action_pause);
     tray_menu_->addAction(ui_.action_stop);
+    tray_menu_->addSeparator();
     tray_menu_->addAction(ui_.action_quit);
 
-    tray_icon_ = new QSystemTrayIcon(*icon_, this);
+    tray_icon_ = new QSystemTrayIcon(*title_icon_, this);
     tray_icon_->setContextMenu(tray_menu_);
     tray_icon_->show();
 
@@ -232,16 +226,19 @@ void MainWindow::CreateConnections() {
     connect(ui_.short_break_duration_slider, &QSlider::valueChanged, this, &MainWindow::onShortBreakDurationChange);
     connect(ui_.long_duration_slider, &QSlider::valueChanged, this, &MainWindow::onLongBreakdurationChange);
     connect(ui_.sound_effect_checkbox, &QCheckBox::stateChanged, [this](int s) { sound_effect_ = (s == Qt::Checked); });
+    connect(ui_.message_checkbox, &QCheckBox::stateChanged, [this](int s) { popup_messagebox_ = (s == Qt::Checked); });
+    connect(ui_.tray_popup_checkbox, &QCheckBox::stateChanged, [this](int s) { tray_popup_ = (s == Qt::Checked); });
     connect(poromodo_, &Poromodo::TimeLeftStr, [this](QString s) { ui_.lcdNumber->display(s); });
 
-    //    connect(ui_.action_start, &QAction::triggered, poromodo_, &Poromodo::StartPoromodo);
     connect(ui_.start_buttom, &QPushButton::pressed, this, &MainWindow::onStartPorodomoPorcess);
     connect(ui_.action_pause, &QAction::triggered, this, &MainWindow::onPuaseUnpause);
     connect(ui_.pause_buttom, &QPushButton::pressed, this, &MainWindow::onPuaseUnpause);
     connect(ui_.action_stop, &QAction::triggered, poromodo_, &Poromodo::Stop);
     connect(ui_.stop_buttom, &QPushButton::pressed, this, &MainWindow::onStopPorodomoPorcess);
 
-    connect(poromodo_, &Poromodo::StatusChanged, this, &MainWindow::onStatusChange);
+    connect(poromodo_, &Poromodo::StatusChangedAuto, this, &MainWindow::onStatusChange);
+    connect(poromodo_, &Poromodo::StatusChangedManual, this, &MainWindow::onStatusChange);
+    connect(poromodo_, &Poromodo::StatusChangedAuto, this, &MainWindow::onStatusChangedNotification);
 }
 
 void MainWindow::ReadSettings() {
@@ -260,6 +257,12 @@ void MainWindow::ReadSettings() {
 
     sound_effect_ = settings_->value("other/sound_effect", true).toBool();
     ui_.sound_effect_checkbox->setChecked(sound_effect_);
+
+    popup_messagebox_ = settings_->value("other/popup_messagebox", true).toBool();
+    ui_.message_checkbox->setChecked(popup_messagebox_);
+
+    tray_popup_ = settings_->value("other/tray_popup", true).toBool();
+    ui_.tray_popup_checkbox->setChecked(tray_popup_);
 }
 
 void MainWindow::WriteSettings() {
@@ -268,12 +271,21 @@ void MainWindow::WriteSettings() {
     settings_->setValue("poromodo/long_break_duration", ui_.long_duration_slider->value());
 
     settings_->setValue("other/sound_effect", sound_effect_);
+    settings_->setValue("other/popup_messagebox", popup_messagebox_);
+    settings_->setValue("other/tray_popup", tray_popup_);
 
     settings_->sync();
 }
 
-void MainWindow::PlaySound() {
+void MainWindow::onStatusChangedNotification(Poromodo::Status s) {
+    QString status_info = StatusInfo.at(s);
+    if (tray_popup_) {
+        tray_icon_->showMessage(status_info, status_info);
+    }
     if (sound_effect_) {
-        QSound::play(":/sounds/loud-bell.wav");
+        QSound::play(":/sounds/bell.wav");
+    }
+    if (popup_messagebox_) {
+        QMessageBox::information(this, tr("Status Changed"), status_info);
     }
 }

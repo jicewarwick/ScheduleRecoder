@@ -33,7 +33,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="widget">
        <attribute name="title">
@@ -110,6 +110,10 @@
             <property name="text">
              <string>Start</string>
             </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/icons/start.png</normaloff>:/icons/start.png</iconset>
+            </property>
            </widget>
           </item>
           <item>
@@ -120,6 +124,10 @@
             <property name="text">
              <string>Pause</string>
             </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/icons/pause.png</normaloff>:/icons/pause.png</iconset>
+            </property>
            </widget>
           </item>
           <item>
@@ -129,6 +137,10 @@
             </property>
             <property name="text">
              <string>Stop</string>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/icons/stop.png</normaloff>:/icons/stop.png</iconset>
             </property>
            </widget>
           </item>
@@ -332,10 +344,30 @@
            <string>Other Settings</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
+           <item row="2" column="0">
+            <widget class="QCheckBox" name="message_checkbox">
+             <property name="text">
+              <string>Popup MessageBox</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
             <widget class="QCheckBox" name="sound_effect_checkbox">
              <property name="text">
               <string>Sound Effects</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="tray_popup_checkbox">
+             <property name="text">
+              <string>Tray Popup</string>
              </property>
              <property name="checked">
               <bool>true</bool>
@@ -377,49 +409,75 @@
     <property name="title">
      <string>Actions</string>
     </property>
-    <addaction name="action_start"/>
-    <addaction name="action_pause"/>
-    <addaction name="action_stop"/>
-    <addaction name="separator"/>
     <addaction name="action_quit"/>
    </widget>
    <addaction name="menuActions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action_start">
-   <property name="text">
-    <string>Start</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+N</string>
-   </property>
-  </action>
-  <action name="action_stop">
-   <property name="text">
-    <string>Stop</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+E</string>
-   </property>
-  </action>
   <action name="action_quit">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/close.png</normaloff>:/icons/close.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Quit</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="action_pause">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/pause.png</normaloff>:/icons/pause.png</iconset>
+   </property>
    <property name="text">
-    <string>Pause</string>
+    <string>&amp;Pause</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
    </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
+  </action>
+  <action name="action_stop">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/icons/stop.png</normaloff>:/icons/stop.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Stop</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>false</bool>
+   </property>
   </action>
  </widget>
- <resources/>
+ <tabstops>
+  <tabstop>activity_combo</tabstop>
+  <tabstop>category_combo</tabstop>
+  <tabstop>hashtags_lineedit</tabstop>
+  <tabstop>start_buttom</tabstop>
+  <tabstop>pause_buttom</tabstop>
+  <tabstop>stop_buttom</tabstop>
+  <tabstop>log_view</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>records_view</tabstop>
+  <tabstop>short_break_duration_slider</tabstop>
+  <tabstop>long_duration_slider</tabstop>
+  <tabstop>poromodo_duration_slider</tabstop>
+  <tabstop>sound_effect_checkbox</tabstop>
+ </tabstops>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
  <slots>
   <slot>poromodo_duration_change(int)</slot>

@@ -1,11 +1,12 @@
 <RCC>
-    <qresource prefix="/">
-        <file alias="icon.png">data/icon.png</file>
-    </qresource>
     <qresource prefix="/sounds">
         <file alias="bell.wav">data/sounds/bell.wav</file>
-        <file alias="clock.wav">data/sounds/clock.wav</file>
-        <file alias="loud-bell.wav">data/sounds/loud-bell.wav</file>
-        <file alias="timer.wav">data/sounds/timer.wav</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file alias="pause.png">data/icons/48px-Gnome-media-playback-pause.svg.png</file>
+        <file alias="start.png">data/icons/48px-Gnome-media-playback-start.svg.png</file>
+        <file alias="stop.png">data/icons/48px-Gnome-media-playback-stop.svg.png</file>
+        <file alias="close.png">data/icons/48px-Gnome-window-close.svg.png</file>
+        <file alias="icon.png">data/icons/icon.png</file>
     </qresource>
 </RCC>
