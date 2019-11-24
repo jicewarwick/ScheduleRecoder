@@ -3,30 +3,19 @@
 
 #include <QCloseEvent>
 #include <QCompleter>
-#include <QCoreApplication>
-#include <QDebug>
 #include <QMainWindow>
-#include <QMessageBox>
 #include <QSettings>
-#include <QSound>
-#include <QSqlDatabase>
 #include <QSqlTableModel>
-#include <QString>
 #include <QStringList>
+#include <QStringListModel>
 #include <QSystemTrayIcon>
-#include <QWidget>
 #include <map>
-#include <set>
-#include <string>
-#include <vector>
 
+#include "hashtagcompleter.h"
 #include "poromodo.h"
 #include "ui_mainwindow.h"
 
 using std::map;
-using std::set;
-using std::string;
-using std::vector;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -77,8 +66,8 @@ private:
 
     QStringList activities_;
     QStringList categories_;
-    QStringList hashtags_;
-    QCompleter* hashtag_completer_;
+    QStringListModel* hashtags_;
+    HashtagCompleter* hashtag_completer_;
 
     const map<Poromodo::Status, QString> StatusInfo = {{Poromodo::Status::NONE, tr("READY")},
                                                        {Poromodo::Status::POROMODO, tr("POROMODO")},

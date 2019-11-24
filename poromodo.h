@@ -2,20 +2,13 @@
 #define POROMODO_H
 
 #include <QDateTime>
-#include <QDebug>
 #include <QObject>
-#include <QSqlDatabase>
-#include <QSqlQuery>
 #include <QStringList>
 #include <QTimer>
 #include <set>
-#include <stdexcept>
-#include <string>
 
 using namespace std::chrono;
-using std::runtime_error;
 using std::set;
-using std::string;
 
 const QString kDBLoc = "./db.sqlite";
 const QString kTableName = "Records";
@@ -35,9 +28,9 @@ public:
     void setLongBreakDurationMin(int dur) { long_break_dur_ = minutes(dur); }
 
     // db queryer
-    QStringList getAllCategories();
-    QStringList getAllActivities();
-    QStringList getAllHashtags();
+    QStringList getAllCategories() const { return SetToQStringList(QueryDatabaseColumn("category")); }
+    QStringList getAllActivities() const { return SetToQStringList(QueryDatabaseColumn("activity")); }
+    QStringList getAllHashtags() const;
 
 signals:
     void TimeLeftStr(QString);
@@ -81,8 +74,8 @@ private:
 
     void set_status_auto(Status s);
     void set_status_mannual(Status s);
-    set<QString> QueryDatabaseColumn(QString column);
-    QStringList SetToQStringList(set<QString> input);
+    set<QString> QueryDatabaseColumn(QString column) const;
+    static QStringList SetToQStringList(set<QString> input);
     void InsertRecords();
 };
 

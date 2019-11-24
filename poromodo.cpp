@@ -1,12 +1,17 @@
 #include "poromodo.h"
 
+#include <QDebug>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <stdexcept>
+
 Poromodo::Poromodo(QObject* parent) : QObject(parent) {
     timer_ = new QTimer(this);
     connect(timer_, &QTimer::timeout, this, &Poromodo::onTimeOut);
     QSqlDatabase conn = QSqlDatabase::addDatabase("QSQLITE");
     conn.setDatabaseName(kDBLoc);
     if (!conn.open()) {
-        throw runtime_error("Cannot connect to database.");
+        throw std::runtime_error("Cannot connect to database.");
     } else {
         qDebug() << "Database conncected.";
         QStringList tables = conn.tables();
@@ -27,11 +32,7 @@ Poromodo::Poromodo(int poromodo_dur_min, int short_break_dur_min, int long_break
     long_break_dur_ = minutes(long_break_dur_min);
 }
 
-QStringList Poromodo::getAllCategories() { return SetToQStringList(QueryDatabaseColumn("category")); }
-
-QStringList Poromodo::getAllActivities() { return SetToQStringList(QueryDatabaseColumn("activity")); }
-
-QStringList Poromodo::getAllHashtags() {
+QStringList Poromodo::getAllHashtags() const {
     set<QString> results;
     set<QString> hastag_lins = QueryDatabaseColumn("hashtags");
     for (auto it : hastag_lins) {
@@ -119,7 +120,7 @@ void Poromodo::set_status_mannual(Poromodo::Status s) {
     }
 }
 
-set<QString> Poromodo::QueryDatabaseColumn(QString column) {
+set<QString> Poromodo::QueryDatabaseColumn(QString column) const {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
     query.setForwardOnly(true);

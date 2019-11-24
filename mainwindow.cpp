@@ -1,5 +1,12 @@
 #include "mainwindow.h"
 
+#include <QCoreApplication>
+#include <QDebug>
+#include <QMessageBox>
+#include <QSound>
+#include <QSqlDatabase>
+#include <QString>
+
 ////////////////////////////////////////////////////////////////////////////////
 /// public functions
 ////////////////////////////////////////////////////////////////////////////////
@@ -119,9 +126,11 @@ void MainWindow::onStartPorodomoPorcess() {
         categories_ << new_category;
         ui_.category_combo->insertItem(0, new_category);
     }
-    for (QString it : new_hashtag.split(" ")) {
-        if (!hashtags_.contains(it)) {
-            hashtags_ << it;
+    for (QString& it : new_hashtag.split(" ")) {
+        if (!hashtags_->stringList().contains(it)) {
+            qDebug() << "adding " << it << " to hashtag list";
+            hashtags_->insertRows(0, 1);
+            hashtags_->setData(hashtags_->index(0), it);
         }
     }
 
@@ -175,7 +184,7 @@ void MainWindow::InitDB() {
     }
     activities_ = poromodo_->getAllActivities();
     categories_ = poromodo_->getAllCategories();
-    hashtags_ = poromodo_->getAllHashtags();
+    hashtags_ = new QStringListModel(poromodo_->getAllHashtags(), this);
 }
 
 void MainWindow::InitGUI() {
@@ -195,13 +204,15 @@ void MainWindow::InitGUI() {
 
     ui_.records_view->setModel(records_model_);
     ui_.records_view->hideColumn(0);
+    ui_.records_view->resizeColumnsToContents();
+    ui_.records_view->horizontalHeader()->setStretchLastSection(true);
     ui_.records_view->show();
-    ui_.records_view->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     ui_.log_view->setModel(log_model_);
     ui_.log_view->hideColumn(0);
+    ui_.log_view->resizeColumnsToContents();
+    ui_.log_view->horizontalHeader()->setStretchLastSection(true);
     ui_.log_view->show();
-    ui_.log_view->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     // existing stuff
     ui_.lcdNumber->display("00:00");
@@ -209,7 +220,7 @@ void MainWindow::InitGUI() {
     ui_.category_combo->addItems(categories_);
     ui_.activity_combo->addItem("");
     ui_.activity_combo->addItems(activities_);
-    hashtag_completer_ = new QCompleter(hashtags_, this);
+    hashtag_completer_ = new HashtagCompleter(hashtags_, this);
     ui_.hashtags_lineedit->setCompleter(hashtag_completer_);
 }
 

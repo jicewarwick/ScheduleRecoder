@@ -15,7 +15,7 @@ if (NOT ${CMAKE_BUILD_TYPE} MATCHES "Debug")
 	add_compile_definitions(QT_NO_DEBUG_OUTPUT)
 endif()
 
-find_package(Qt5 COMPONENTS Widgets Sql Multimedia LinguistTools REQUIRED)
+find_package(Qt5 COMPONENTS Core Widgets Sql Multimedia LinguistTools REQUIRED)
 
 set(TS_FILES ${CMAKE_SOURCE_DIR}/translations/main_zh_CN.ts)
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/translations)
@@ -31,10 +31,13 @@ add_executable(Schedule WIN32
   ${QM_FILES}
 )
 
+add_library(HashtagCompleter hashtagcompleter.cpp hashtagcompleter.h)
 add_library(Poromodo poromodo.cpp poromodo.h)
-target_link_libraries(Poromodo PRIVATE Qt5::Core Qt5::Sql)
 
-target_link_libraries(Schedule PRIVATE Poromodo Qt5::Widgets Qt5::Sql Qt5::Multimedia)
+target_link_libraries(HashtagCompleter PRIVATE Qt5::Widgets)
+target_link_libraries(Poromodo PRIVATE Qt5::Core Qt5::Sql)
+target_link_libraries(Schedule PRIVATE Poromodo HashtagCompleter Qt5::Widgets Qt5::Sql Qt5::Multimedia)
+#target_link_libraries(Schedule PRIVATE Poromodo Qt5::Widgets Qt5::Sql Qt5::Multimedia)
 
 install(TARGETS Schedule RUNTIME DESTINATION bin COMPONENT binary)
 install(FILES ${QM_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/translations COMPONENT language)
