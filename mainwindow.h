@@ -36,6 +36,7 @@ private slots:
     void onQuitWindow();
     void onClickTray(QSystemTrayIcon::ActivationReason);
 
+    void onPoromodoTimeLeftStr(QString s);
     void onStatusChange(Poromodo::Status s);
     void onStartPorodomoPorcess();
     void onPuaseUnpause();
@@ -49,8 +50,8 @@ private:
 
     // settings
     bool sound_effect_;
-    bool popup_messagebox_;
     bool tray_popup_;
+    bool hide_to_tray_popup = true;
     QSettings* settings_;
 
     const QIcon* title_icon_ = new QIcon(":/icons/icon.png");

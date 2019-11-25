@@ -344,10 +344,10 @@
            <string>Other Settings</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
-           <item row="2" column="0">
-            <widget class="QCheckBox" name="message_checkbox">
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="tray_popup_checkbox">
              <property name="text">
-              <string>Popup MessageBox</string>
+              <string>Tray Popup</string>
              </property>
              <property name="checked">
               <bool>true</bool>
@@ -358,16 +358,6 @@
             <widget class="QCheckBox" name="sound_effect_checkbox">
              <property name="text">
               <string>Sound Effects</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QCheckBox" name="tray_popup_checkbox">
-             <property name="text">
-              <string>Tray Popup</string>
              </property>
              <property name="checked">
               <bool>true</bool>
@@ -402,7 +392,7 @@
      <x>0</x>
      <y>0</y>
      <width>830</width>
-     <height>24</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuActions">
@@ -426,10 +416,13 @@
     <string>Ctrl+Q</string>
    </property>
    <property name="iconVisibleInMenu">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="action_pause">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/icons/pause.png</normaloff>:/icons/pause.png</iconset>
@@ -441,10 +434,13 @@
     <string>Ctrl+P</string>
    </property>
    <property name="iconVisibleInMenu">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
   <action name="action_stop">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="resources.qrc">
      <normaloff>:/icons/stop.png</normaloff>:/icons/stop.png</iconset>
@@ -456,7 +452,7 @@
     <string>Ctrl+S</string>
    </property>
    <property name="iconVisibleInMenu">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </action>
  </widget>

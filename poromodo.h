@@ -75,8 +75,9 @@ private:
     void set_status_auto(Status s);
     void set_status_mannual(Status s);
     set<QString> QueryDatabaseColumn(QString column) const;
-    static QStringList SetToQStringList(set<QString> input);
     void InsertRecords();
+
+    static QStringList SetToQStringList(set<QString> input);
 };
 
 #endif	// POROMODO_H
