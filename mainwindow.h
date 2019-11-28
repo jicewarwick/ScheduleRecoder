@@ -43,6 +43,8 @@ private slots:
     void onStopPorodomoPorcess();
     void onStatusChangedNotification(Poromodo::Status s);
 
+    void onLogEntryChange(QModelIndex index);
+
 private:
     Ui::mainwindow ui_;
 
@@ -83,6 +85,7 @@ private:
 
     void ReadSettings();
     void WriteSettings();
+    static void SettingUpTableView(QTableView* view);
 };
 
 #endif	// MAINWINDOW_H

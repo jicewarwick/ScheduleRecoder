@@ -5,6 +5,8 @@
 #include <QMessageBox>
 #include <QSound>
 #include <QSqlDatabase>
+#include <QSqlField>
+#include <QSqlRecord>
 #include <QString>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -139,6 +141,9 @@ void MainWindow::onStartPorodomoPorcess() {
     ui_.start_buttom->setEnabled(false);
     ui_.pause_buttom->setEnabled(true);
     ui_.stop_buttom->setEnabled(true);
+    ui_.activity_combo->setEnabled(false);
+    ui_.category_combo->setEnabled(false);
+    ui_.hashtags_lineedit->setEnabled(false);
 
     ui_.action_pause->setEnabled(true);
     ui_.action_stop->setEnabled(true);
@@ -156,6 +161,10 @@ void MainWindow::onStopPorodomoPorcess() {
     ui_.start_buttom->setEnabled(true);
     ui_.pause_buttom->setEnabled(false);
     ui_.stop_buttom->setEnabled(false);
+    ui_.activity_combo->setEnabled(true);
+    ui_.category_combo->setEnabled(true);
+    ui_.hashtags_lineedit->setEnabled(true);
+    ui_.lcdNumber->display("00:00");
 
     ui_.action_pause->setEnabled(false);
     ui_.action_stop->setEnabled(false);
@@ -218,15 +227,11 @@ void MainWindow::InitGUI() {
     tray_icon_->show();
 
     ui_.records_view->setModel(records_model_);
-    ui_.records_view->hideColumn(0);
-    ui_.records_view->resizeColumnsToContents();
-    ui_.records_view->horizontalHeader()->setStretchLastSection(true);
+    SettingUpTableView(ui_.records_view);
     ui_.records_view->show();
 
     ui_.log_view->setModel(log_model_);
-    ui_.log_view->hideColumn(0);
-    ui_.log_view->resizeColumnsToContents();
-    ui_.log_view->horizontalHeader()->setStretchLastSection(true);
+    SettingUpTableView(ui_.log_view);
     ui_.log_view->show();
 
     // existing stuff
@@ -262,6 +267,9 @@ void MainWindow::CreateConnections() {
     connect(poromodo_, &Poromodo::StatusChangedAuto, this, &MainWindow::onStatusChange);
     connect(poromodo_, &Poromodo::StatusChangedManual, this, &MainWindow::onStatusChange);
     connect(poromodo_, &Poromodo::StatusChangedAuto, this, &MainWindow::onStatusChangedNotification);
+
+    connect(ui_.log_view, &QTableView::clicked, this, &MainWindow::onLogEntryChange);
+    connect(ui_.records_view, &QTableView::clicked, this, &MainWindow::onLogEntryChange);
 }
 
 void MainWindow::ReadSettings() {
@@ -296,6 +304,13 @@ void MainWindow::WriteSettings() {
     settings_->sync();
 }
 
+void MainWindow::SettingUpTableView(QTableView* view) {
+    view->hideColumn(0);
+    view->resizeColumnsToContents();
+    view->horizontalHeader()->setStretchLastSection(true);
+    view->setSelectionBehavior(QAbstractItemView::SelectRows);
+}
+
 void MainWindow::onStatusChangedNotification(Poromodo::Status s) {
     QString status_info = StatusInfo.at(s);
     if (tray_popup_) {
@@ -303,5 +318,15 @@ void MainWindow::onStatusChangedNotification(Poromodo::Status s) {
     }
     if (sound_effect_) {
         QSound::play(":/sounds/bell.wav");
+    }
+}
+
+void MainWindow::onLogEntryChange(QModelIndex index) {
+    if (ui_.start_buttom->isEnabled()) {
+        auto model = qobject_cast<const QSqlTableModel*>(index.model());
+        QSqlRecord record = model->record(index.row());
+        ui_.activity_combo->setEditText(record.field("activity").value().toString());
+        ui_.category_combo->setEditText(record.field("category").value().toString());
+        ui_.hashtags_lineedit->setText(record.field("hashtags").value().toString());
     }
 }
