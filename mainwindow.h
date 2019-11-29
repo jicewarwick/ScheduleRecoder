@@ -54,6 +54,7 @@ private:
     bool sound_effect_;
     bool tray_popup_;
     bool hide_to_tray_popup = true;
+    bool start_minimized_;
     QSettings* settings_;
 
     const QIcon* title_icon_ = new QIcon(":/icons/icon.png");

@@ -256,6 +256,7 @@ void MainWindow::CreateConnections() {
     connect(ui_.long_duration_slider, &QSlider::valueChanged, this, &MainWindow::onLongBreakdurationChange);
     connect(ui_.sound_effect_checkbox, &QCheckBox::stateChanged, [this](int s) { sound_effect_ = (s == Qt::Checked); });
     connect(ui_.tray_popup_checkbox, &QCheckBox::stateChanged, [this](int s) { tray_popup_ = (s == Qt::Checked); });
+    connect(ui_.start_minimize_checkbox, &QCheckBox::stateChanged, [this](int s) { start_minimized_ = (s == Qt::Checked); });
     connect(poromodo_, &Poromodo::TimeLeftStr, this, &MainWindow::onPoromodoTimeLeftStr);
 
     connect(ui_.start_buttom, &QPushButton::pressed, this, &MainWindow::onStartPorodomoPorcess);
@@ -291,6 +292,13 @@ void MainWindow::ReadSettings() {
 
     tray_popup_ = settings_->value("other/tray_popup", true).toBool();
     ui_.tray_popup_checkbox->setChecked(tray_popup_);
+
+    start_minimized_ = settings_->value("other/start_minimized", false).toBool();
+    ui_.start_minimize_checkbox->setChecked(start_minimized_);
+
+    if (!start_minimized_) {
+        show();
+    }
 }
 
 void MainWindow::WriteSettings() {
@@ -300,6 +308,7 @@ void MainWindow::WriteSettings() {
 
     settings_->setValue("other/sound_effect", sound_effect_);
     settings_->setValue("other/tray_popup", tray_popup_);
+    settings_->setValue("other/start_minimized", start_minimized_);
 
     settings_->sync();
 }

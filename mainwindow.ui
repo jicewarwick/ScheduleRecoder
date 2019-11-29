@@ -344,7 +344,7 @@
            <string>Other Settings</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
+           <item row="1" column="0">
             <widget class="QCheckBox" name="tray_popup_checkbox">
              <property name="text">
               <string>Tray Popup</string>
@@ -354,10 +354,20 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
+           <item row="2" column="0">
             <widget class="QCheckBox" name="sound_effect_checkbox">
              <property name="text">
               <string>Sound Effects</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QCheckBox" name="start_minimize_checkbox">
+             <property name="text">
+              <string>Start Minimized</string>
              </property>
              <property name="checked">
               <bool>true</bool>
