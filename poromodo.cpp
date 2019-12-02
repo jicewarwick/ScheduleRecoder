@@ -80,7 +80,12 @@ void Poromodo::Stop() {
     timer_->stop();
     if (status_ != Status::NONE) {
         set_status_mannual(Status::NONE);
-        InsertRecords();
+        end_time_ = QDateTime::currentDateTime();
+        long long whole_duration_milliseconds = start_time_.msecsTo(end_time_);
+        work_duration_min_= int((whole_duration_milliseconds - pause_duration_milliseconds_) / 60000);
+        if (work_duration_min_ > minimum_logging_duration_) {
+            InsertRecords();
+        }
     }
 }
 
@@ -168,19 +173,14 @@ void Poromodo::onTimeOut() {
 }
 
 void Poromodo::InsertRecords() {
-    auto end_time = QDateTime::currentDateTime();
-    long whole_duration_milliseconds = start_time_.msecsTo(end_time);
-    long work_duration_sec = (whole_duration_milliseconds - pause_duration_milliseconds_) / 1000;
-
-    // append record to database
     auto db = QSqlDatabase::database();
     QSqlQuery query(db);
     query.prepare("INSERT INTO " + kTableName +
                   "(start_time, end_time, duration, category, activity, hashtags) "
                   "VALUES(:start_time, :end_time, :duration, :category, :activity, :hashtags);");
     query.bindValue(":start_time", start_time_.toString(Qt::DateFormat::ISODate));
-    query.bindValue(":end_time", end_time.toString(Qt::DateFormat::ISODate));
-    query.bindValue(":duration", int(work_duration_sec / 60));
+    query.bindValue(":end_time", end_time_.toString(Qt::DateFormat::ISODate));
+    query.bindValue(":duration", work_duration_min_);
     query.bindValue(":category", category_);
     query.bindValue(":activity", activity_);
     query.bindValue(":hashtags", hashtags_);

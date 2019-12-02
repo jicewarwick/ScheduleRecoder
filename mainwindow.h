@@ -32,6 +32,7 @@ private slots:
     void onPoromodoDurationChange(int);
     void onShortBreakDurationChange(int);
     void onLongBreakdurationChange(int);
+    void onMinimumLoggingDurationChange(int);
 
     void onQuitWindow();
     void onClickTray(QSystemTrayIcon::ActivationReason);

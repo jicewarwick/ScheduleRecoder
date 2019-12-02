@@ -39,6 +39,7 @@ signals:
     void StatusChangedManual(Status);
 
 public slots:
+    void setMinimumLoggingDuration(int n) { minimum_logging_duration_ = n;}
     void StartPoromodo(QString category, QString activity, QString hashtags);
     void Pause();
     void Unpause();
@@ -62,7 +63,10 @@ private:
     long pause_duration_milliseconds_ = 0;
 
     QDateTime start_time_;
+    QDateTime end_time_;
     QDateTime pause_start_time_;
+    int work_duration_min_;
+    int minimum_logging_duration_ = 1;
 
     QString category_;
     QString activity_;

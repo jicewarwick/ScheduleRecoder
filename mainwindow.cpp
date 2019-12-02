@@ -51,19 +51,28 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 void MainWindow::onPoromodoDurationChange(int n) {
     QString text = tr("Poromodo Duration: ") + QString::number(n) + tr("min");
     ui_.pomorodo_duration_label->setText(text);
+    ui_.long_duration_slider->setMaximum(n);
     poromodo_->setPoromodoDurationMin(n);
 }
 
 void MainWindow::onShortBreakDurationChange(int n) {
     QString text = tr("Short Break Duration: ") + QString::number(n) + tr("min");
     ui_.short_break_duration_label->setText(text);
+    ui_.min_duration_slider->setMaximum(std::min(n, this->ui_.short_break_duration_slider->value()));
     poromodo_->setShortBreakDurationMin(n);
 }
 
 void MainWindow::onLongBreakdurationChange(int n) {
     QString text = tr("Long Break Duration: ") + QString::number(n) + tr("min");
     ui_.long_break_duration_label->setText(text);
+    ui_.short_break_duration_slider->setMaximum(std::min(n, ui_.poromodo_duration_slider->value()));
     poromodo_->setLongBreakDurationMin(n);
+}
+
+void MainWindow::onMinimumLoggingDurationChange(int n) {
+    QString text = tr("Minimum Logging Duration: ") + QString::number(n) + tr("min");
+    ui_.min_logging_duration_label->setText(text);
+    poromodo_->setMinimumLoggingDuration(n);
 }
 
 void MainWindow::onPuaseUnpause() {
@@ -243,21 +252,21 @@ void MainWindow::InitGUI() {
 }
 
 void MainWindow::CreateConnections() {
-    connect(tray_icon_, &QSystemTrayIcon::activated, this, &MainWindow::onClickTray);
-    connect(ui_.action_quit, &QAction::triggered, this, &MainWindow::onQuitWindow);
-    connect(ui_.poromodo_duration_slider, &QSlider::valueChanged,
-            [this](int n) { ui_.long_duration_slider->setMaximum(n); });
-    connect(ui_.long_duration_slider, &QSlider::valueChanged, [this](int n) {
-        ui_.short_break_duration_slider->setMaximum(std::min(n, this->ui_.poromodo_duration_slider->value()));
-    });
-
+    // main setttings
     connect(ui_.poromodo_duration_slider, &QSlider::valueChanged, this, &MainWindow::onPoromodoDurationChange);
     connect(ui_.short_break_duration_slider, &QSlider::valueChanged, this, &MainWindow::onShortBreakDurationChange);
     connect(ui_.long_duration_slider, &QSlider::valueChanged, this, &MainWindow::onLongBreakdurationChange);
+    connect(ui_.min_duration_slider, &QSlider::valueChanged, this, &MainWindow::onMinimumLoggingDurationChange);
+
+    // other settings
     connect(ui_.sound_effect_checkbox, &QCheckBox::stateChanged, [this](int s) { sound_effect_ = (s == Qt::Checked); });
     connect(ui_.tray_popup_checkbox, &QCheckBox::stateChanged, [this](int s) { tray_popup_ = (s == Qt::Checked); });
     connect(ui_.start_minimize_checkbox, &QCheckBox::stateChanged, [this](int s) { start_minimized_ = (s == Qt::Checked); });
     connect(poromodo_, &Poromodo::TimeLeftStr, this, &MainWindow::onPoromodoTimeLeftStr);
+
+    // menus and buttoms
+    connect(tray_icon_, &QSystemTrayIcon::activated, this, &MainWindow::onClickTray);
+    connect(ui_.action_quit, &QAction::triggered, this, &MainWindow::onQuitWindow);
 
     connect(ui_.start_buttom, &QPushButton::pressed, this, &MainWindow::onStartPorodomoPorcess);
     connect(ui_.action_pause, &QAction::triggered, this, &MainWindow::onPuaseUnpause);
@@ -265,10 +274,12 @@ void MainWindow::CreateConnections() {
     connect(ui_.action_stop, &QAction::triggered, poromodo_, &Poromodo::Stop);
     connect(ui_.stop_buttom, &QPushButton::pressed, this, &MainWindow::onStopPorodomoPorcess);
 
+    // core lib
     connect(poromodo_, &Poromodo::StatusChangedAuto, this, &MainWindow::onStatusChange);
     connect(poromodo_, &Poromodo::StatusChangedManual, this, &MainWindow::onStatusChange);
     connect(poromodo_, &Poromodo::StatusChangedAuto, this, &MainWindow::onStatusChangedNotification);
 
+    // utils
     connect(ui_.log_view, &QTableView::clicked, this, &MainWindow::onLogEntryChange);
     connect(ui_.records_view, &QTableView::clicked, this, &MainWindow::onLogEntryChange);
 }
@@ -287,6 +298,10 @@ void MainWindow::ReadSettings() {
     ui_.long_duration_slider->setValue(val);
     poromodo_->setLongBreakDurationMin(val);
 
+    val = settings_->value("poromodo/minimum_logging_duration", 1).toInt();
+    ui_.min_duration_slider->setValue(val);
+    poromodo_->setMinimumLoggingDuration(val);
+
     sound_effect_ = settings_->value("other/sound_effect", true).toBool();
     ui_.sound_effect_checkbox->setChecked(sound_effect_);
 
@@ -298,6 +313,8 @@ void MainWindow::ReadSettings() {
 
     if (!start_minimized_) {
         show();
+    } else {
+        tray_popup_ = false;
     }
 }
 
@@ -305,6 +322,7 @@ void MainWindow::WriteSettings() {
     settings_->setValue("poromodo/poromodo_duration", ui_.poromodo_duration_slider->value());
     settings_->setValue("poromodo/short_break_duration", ui_.short_break_duration_slider->value());
     settings_->setValue("poromodo/long_break_duration", ui_.long_duration_slider->value());
+    settings_->setValue("poromodo/minimum_logging_duration", ui_.min_duration_slider->value());
 
     settings_->setValue("other/sound_effect", sound_effect_);
     settings_->setValue("other/tray_popup", tray_popup_);

@@ -266,16 +266,6 @@
            <string>Porodomo Settings</string>
           </property>
           <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QLabel" name="pomorodo_duration_label">
-             <property name="text">
-              <string>Poromodo Duration: 25min</string>
-             </property>
-             <property name="buddy">
-              <cstring>poromodo_duration_slider</cstring>
-             </property>
-            </widget>
-           </item>
            <item row="1" column="1">
             <widget class="QSlider" name="short_break_duration_slider">
              <property name="maximum">
@@ -302,16 +292,6 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="short_break_duration_label">
-             <property name="text">
-              <string>Short Beak Duration: 5min</string>
-             </property>
-             <property name="buddy">
-              <cstring>short_break_duration_slider</cstring>
-             </property>
-            </widget>
-           </item>
            <item row="2" column="0">
             <widget class="QLabel" name="long_break_duration_label">
              <property name="text">
@@ -322,6 +302,26 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="pomorodo_duration_label">
+             <property name="text">
+              <string>Poromodo Duration: 25min</string>
+             </property>
+             <property name="buddy">
+              <cstring>poromodo_duration_slider</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="short_break_duration_label">
+             <property name="text">
+              <string>Short Beak Duration: 5min</string>
+             </property>
+             <property name="buddy">
+              <cstring>short_break_duration_slider</cstring>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="1">
             <widget class="QSlider" name="poromodo_duration_slider">
              <property name="maximum">
@@ -329,6 +329,23 @@
              </property>
              <property name="value">
               <number>25</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="min_logging_duration_label">
+             <property name="text">
+              <string>Minimum Duration for Logging: 1min</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QSlider" name="min_duration_slider">
+             <property name="maximum">
+              <number>5</number>
              </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
