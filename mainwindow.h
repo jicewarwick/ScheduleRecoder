@@ -12,7 +12,7 @@
 #include <map>
 
 #include "hashtagcompleter.h"
-#include "poromodo.h"
+#include "pomodoro.h"
 #include "ui_mainwindow.h"
 
 using std::map;
@@ -38,11 +38,11 @@ private slots:
     void onClickTray(QSystemTrayIcon::ActivationReason);
 
     void onPoromodoTimeLeftStr(QString s);
-    void onStatusChange(Poromodo::Status s);
+    void onStatusChange(Pomodoro::Status s);
     void onStartPorodomoPorcess();
     void onPuaseUnpause();
     void onStopPorodomoPorcess();
-    void onStatusChangedNotification(Poromodo::Status s);
+    void onStatusChangedNotification(Pomodoro::Status s);
 
     void onLogEntryChange(QModelIndex index);
 
@@ -67,18 +67,18 @@ private:
     QSqlTableModel* records_model_;
     QSqlTableModel* log_model_;
 
-    Poromodo* poromodo_;
+    Pomodoro* poromodo_;
 
     QStringList activities_;
     QStringList categories_;
     QStringListModel* hashtags_;
     HashtagCompleter* hashtag_completer_;
 
-    const map<Poromodo::Status, QString> StatusInfo = {{Poromodo::Status::NONE, tr("READY")},
-                                                       {Poromodo::Status::POROMODO, tr("POROMODO")},
-                                                       {Poromodo::Status::SHORT_BREAK, tr("SHORT BREAK")},
-                                                       {Poromodo::Status::LONG_BREAK, tr("LONG BREAK")},
-                                                       {Poromodo::Status::PAUSE, tr("(PAUSED)")}};
+    const map<Pomodoro::Status, QString> StatusInfo = {{Pomodoro::Status::NONE, tr("READY")},
+                                                       {Pomodoro::Status::POMODORO, tr("POMODORO")},
+                                                       {Pomodoro::Status::SHORT_BREAK, tr("SHORT BREAK")},
+                                                       {Pomodoro::Status::LONG_BREAK, tr("LONG BREAK")},
+                                                       {Pomodoro::Status::PAUSE, tr("(PAUSED)")}};
 
     // functions
     void InitDB();

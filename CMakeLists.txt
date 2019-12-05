@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(QPoromodo LANGUAGES CXX)
+project(PomodoroScehduleRecorder LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -22,7 +22,7 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/translations)
 set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION "translations")
 qt5_add_translation(QM_FILES ${TS_FILES})
 
-add_executable(Schedule WIN32
+add_executable(PomodoroScehduleRecorder WIN32
   main.cpp
   mainwindow.cpp
   mainwindow.h
@@ -32,20 +32,20 @@ add_executable(Schedule WIN32
 )
 
 add_library(HashtagCompleter hashtagcompleter.cpp hashtagcompleter.h)
-add_library(Poromodo poromodo.cpp poromodo.h)
+add_library(Pomodoro pomodoro.cpp pomodoro.h)
 
 target_link_libraries(HashtagCompleter PRIVATE Qt5::Widgets)
-target_link_libraries(Poromodo PRIVATE Qt5::Core Qt5::Sql)
-target_link_libraries(Schedule PRIVATE Poromodo HashtagCompleter Qt5::Widgets Qt5::Sql Qt5::Multimedia)
+target_link_libraries(Pomodoro PRIVATE Qt5::Core Qt5::Sql)
+target_link_libraries(PomodoroScehduleRecorder PRIVATE Pomodoro HashtagCompleter Qt5::Widgets Qt5::Sql Qt5::Multimedia)
 
-install(TARGETS Schedule RUNTIME DESTINATION bin COMPONENT binary)
+install(TARGETS PomodoroScehduleRecorder RUNTIME DESTINATION bin COMPONENT binary)
 install(FILES ${QM_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/translations COMPONENT language)
 install(FILES LICENCE README.md TYPE DESTINATION doc COMPONENT doc)
 
 # packing
-set(CPACK_PACKAGE_NAME "PoromodoScheduleRecorder")
+set(CPACK_PACKAGE_NAME "PomodoroScheduleRecorder")
 set(CPACK_PACKAGE_VENDOR "CJSoft")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Record Poromodo Schedule in sqlite database")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Record Pomodoro Schedule in sqlite database")
 set(CPACK_PACKAGE_VERSION_MAJOR "0")
 set(CPACK_PACKAGE_VERSION_MINOR "9")
 set(CPACK_PACKAGE_VERSION_PATCH "0")

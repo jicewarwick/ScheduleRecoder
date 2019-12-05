@@ -1,13 +1,13 @@
-#include "poromodo.h"
+#include "pomodoro.h"
 
 #include <QDebug>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <stdexcept>
 
-Poromodo::Poromodo(QObject* parent) : QObject(parent) {
+Pomodoro::Pomodoro(QObject* parent) : QObject(parent) {
     timer_ = new QTimer(this);
-    connect(timer_, &QTimer::timeout, this, &Poromodo::onTimeOut);
+    connect(timer_, &QTimer::timeout, this, &Pomodoro::onTimeOut);
     QSqlDatabase conn = QSqlDatabase::addDatabase("QSQLITE");
     conn.setDatabaseName(kDBLoc);
     if (!conn.open()) {
@@ -25,14 +25,14 @@ Poromodo::Poromodo(QObject* parent) : QObject(parent) {
     }
 }
 
-Poromodo::Poromodo(int poromodo_dur_min, int short_break_dur_min, int long_break_dur_min, QObject* parent)
-    : Poromodo(parent) {
+Pomodoro::Pomodoro(int poromodo_dur_min, int short_break_dur_min, int long_break_dur_min, QObject* parent)
+    : Pomodoro(parent) {
     poromodo_dur_ = minutes(poromodo_dur_min);
     short_break_dur_ = minutes(short_break_dur_min);
     long_break_dur_ = minutes(long_break_dur_min);
 }
 
-QStringList Poromodo::getAllHashtags() const {
+QStringList Pomodoro::getAllHashtags() const {
     set<QString> results;
     set<QString> hastag_lins = QueryDatabaseColumn("hashtags");
     for (auto it : hastag_lins) {
@@ -47,18 +47,18 @@ QStringList Poromodo::getAllHashtags() const {
 /// public slots
 ////////////////////////////////////////////////////////////////////////////////
 
-void Poromodo::StartPoromodo(QString category, QString activity, QString hashtags) {
+void Pomodoro::StartPoromodo(QString category, QString activity, QString hashtags) {
     category_ = category;
     activity_ = activity;
     hashtags_ = hashtags;
 
     start_time_ = QDateTime::currentDateTime();
-    set_status_mannual(Status::POROMODO);
+    set_status_mannual(Status::POMODORO);
     qDebug() << "Start Poromodo";
     StartPoromodo();
 }
 
-void Poromodo::Pause() {
+void Pomodoro::Pause() {
     if (status_ != Status::NONE) {
         timer_->stop();
         pre_status_ = status_;
@@ -67,7 +67,7 @@ void Poromodo::Pause() {
     }
 }
 
-void Poromodo::Unpause() {
+void Pomodoro::Unpause() {
     if (status_ == Status::PAUSE) {
         set_status_mannual(pre_status_);
         timer_->start();
@@ -76,7 +76,7 @@ void Poromodo::Unpause() {
     }
 }
 
-void Poromodo::Stop() {
+void Pomodoro::Stop() {
     timer_->stop();
     if (status_ != Status::NONE) {
         set_status_mannual(Status::NONE);
@@ -92,40 +92,40 @@ void Poromodo::Stop() {
 ////////////////////////////////////////////////////////////////////////////////
 /// private functions
 ////////////////////////////////////////////////////////////////////////////////
-void Poromodo::StartPoromodo() {
+void Pomodoro::StartPoromodo() {
     time_left_sec_ = duration_cast<seconds>(poromodo_dur_).count();
     timer_->start(milliseconds(1000));
 }
 
-void Poromodo::StartShortBreak() {
+void Pomodoro::StartShortBreak() {
     qDebug() << "Start Short Break";
     set_status_auto(Status::SHORT_BREAK);
     time_left_sec_ = duration_cast<seconds>(short_break_dur_).count();
     timer_->start(milliseconds(1000));
 }
 
-void Poromodo::StartLongBreak() {
+void Pomodoro::StartLongBreak() {
     qDebug() << "Start Long Break";
     set_status_auto(Status::LONG_BREAK);
     time_left_sec_ = duration_cast<seconds>(long_break_dur_).count();
     timer_->start(milliseconds(1000));
 }
 
-void Poromodo::set_status_auto(Poromodo::Status s) {
+void Pomodoro::set_status_auto(Pomodoro::Status s) {
     if (s != status_) {
         status_ = s;
         emit StatusChangedAuto(s);
     }
 }
 
-void Poromodo::set_status_mannual(Poromodo::Status s) {
+void Pomodoro::set_status_mannual(Pomodoro::Status s) {
     if (s != status_) {
         status_ = s;
         emit StatusChangedManual(s);
     }
 }
 
-set<QString> Poromodo::QueryDatabaseColumn(QString column) const {
+set<QString> Pomodoro::QueryDatabaseColumn(QString column) const {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
     query.setForwardOnly(true);
@@ -140,7 +140,7 @@ set<QString> Poromodo::QueryDatabaseColumn(QString column) const {
     return results;
 }
 
-QStringList Poromodo::SetToQStringList(set<QString> input) {
+QStringList Pomodoro::SetToQStringList(set<QString> input) {
     QStringList output;
     for (auto it : input) {
         output << it;
@@ -148,7 +148,7 @@ QStringList Poromodo::SetToQStringList(set<QString> input) {
     return output;
 }
 
-void Poromodo::onTimeOut() {
+void Pomodoro::onTimeOut() {
     time_left_sec_--;
     emit TimeLeft(seconds(time_left_sec_));
     QString time_left_str = QString::number(time_left_sec_ / 60).rightJustified(2, '0') + ":" +
@@ -156,7 +156,7 @@ void Poromodo::onTimeOut() {
     emit TimeLeftStr(time_left_str);
     //    qDebug() << "Time left in string: " << time_left_str;
     if (time_left_sec_ == 0) {
-        if (status_ == Status::POROMODO) {
+        if (status_ == Status::POMODORO) {
             poromodo_count_++;
             if (poromodo_count_ == kMaxPoomodoCount) {
                 poromodo_count_ = 0;
@@ -165,14 +165,14 @@ void Poromodo::onTimeOut() {
                 StartShortBreak();
             }
         } else {
-            set_status_auto(Status::POROMODO);
+            set_status_auto(Status::POMODORO);
             qDebug() << "Start Poromodo";
             StartPoromodo();
         }
     }
 }
 
-void Poromodo::InsertRecords() {
+void Pomodoro::InsertRecords() {
     auto db = QSqlDatabase::database();
     QSqlQuery query(db);
     query.prepare("INSERT INTO " + kTableName +

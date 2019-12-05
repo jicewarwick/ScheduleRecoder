@@ -1,5 +1,5 @@
-# Poromodo Schedule Recorder
-## Work accouding to POROMODO
+# Pomodoro Schedule Recorder
+## Work accouding to POMODORO
 ![Screen Shot](./data/screenshots/chinese.png)
 ### Dependencies:
 - Cmake

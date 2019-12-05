@@ -14,8 +14,5 @@ QString HashtagCompleter::pathFromIndex(const QModelIndex& index) const {
 
 QStringList HashtagCompleter::splitPath(const QString& path) const {
     int pos = path.lastIndexOf(' ') + 1;
-
-    //    while (pos < path.length() && path.at(pos) == QLatin1Char(' ')) pos++;
-
     return QStringList(path.mid(pos));
 }

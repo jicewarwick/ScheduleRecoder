@@ -13,14 +13,14 @@ using std::set;
 const QString kDBLoc = "./db.sqlite";
 const QString kTableName = "Records";
 
-class Poromodo : public QObject {
+class Pomodoro : public QObject {
     Q_OBJECT
 
 public:
-    Poromodo(QObject* parent = nullptr);
-    Poromodo(int poromodo_dur_min, int short_break_dur_min, int long_break_dur_min, QObject* parent = nullptr);
+    Pomodoro(QObject* parent = nullptr);
+    Pomodoro(int poromodo_dur_min, int short_break_dur_min, int long_break_dur_min, QObject* parent = nullptr);
 
-    enum class Status { NONE, POROMODO, SHORT_BREAK, LONG_BREAK, PAUSE };
+    enum class Status { NONE, POMODORO, SHORT_BREAK, LONG_BREAK, PAUSE };
 
     // setter
     void setPoromodoDurationMin(int dur) { poromodo_dur_ = minutes(dur); }

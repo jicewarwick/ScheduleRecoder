@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     QCoreApplication::setApplicationName("ScheduleRecorder");
     ui_.setupUi(this);
 
-    poromodo_ = new Poromodo(this);
+    poromodo_ = new Pomodoro(this);
     InitDB();
     InitGUI();
     CreateConnections();
@@ -112,9 +112,9 @@ void MainWindow::onPoromodoTimeLeftStr(QString s) {
     tray_icon_->setToolTip(tr("%1: %2 left").arg(ui_.status_label->text()).arg(s));
 }
 
-void MainWindow::onStatusChange(Poromodo::Status s) {
+void MainWindow::onStatusChange(Pomodoro::Status s) {
     QString status_info = StatusInfo.at(s);
-    if (s == Poromodo::Status::PAUSE) {
+    if (s == Pomodoro::Status::PAUSE) {
         status_info = ui_.status_label->text() + status_info;
     }
     ui_.status_label->setText(status_info);
@@ -262,7 +262,7 @@ void MainWindow::CreateConnections() {
     connect(ui_.sound_effect_checkbox, &QCheckBox::stateChanged, [this](int s) { sound_effect_ = (s == Qt::Checked); });
     connect(ui_.tray_popup_checkbox, &QCheckBox::stateChanged, [this](int s) { tray_popup_ = (s == Qt::Checked); });
     connect(ui_.start_minimize_checkbox, &QCheckBox::stateChanged, [this](int s) { start_minimized_ = (s == Qt::Checked); });
-    connect(poromodo_, &Poromodo::TimeLeftStr, this, &MainWindow::onPoromodoTimeLeftStr);
+    connect(poromodo_, &Pomodoro::TimeLeftStr, this, &MainWindow::onPoromodoTimeLeftStr);
 
     // menus and buttoms
     connect(tray_icon_, &QSystemTrayIcon::activated, this, &MainWindow::onClickTray);
@@ -271,13 +271,13 @@ void MainWindow::CreateConnections() {
     connect(ui_.start_buttom, &QPushButton::pressed, this, &MainWindow::onStartPorodomoPorcess);
     connect(ui_.action_pause, &QAction::triggered, this, &MainWindow::onPuaseUnpause);
     connect(ui_.pause_buttom, &QPushButton::pressed, this, &MainWindow::onPuaseUnpause);
-    connect(ui_.action_stop, &QAction::triggered, poromodo_, &Poromodo::Stop);
+    connect(ui_.action_stop, &QAction::triggered, poromodo_, &Pomodoro::Stop);
     connect(ui_.stop_buttom, &QPushButton::pressed, this, &MainWindow::onStopPorodomoPorcess);
 
     // core lib
-    connect(poromodo_, &Poromodo::StatusChangedAuto, this, &MainWindow::onStatusChange);
-    connect(poromodo_, &Poromodo::StatusChangedManual, this, &MainWindow::onStatusChange);
-    connect(poromodo_, &Poromodo::StatusChangedAuto, this, &MainWindow::onStatusChangedNotification);
+    connect(poromodo_, &Pomodoro::StatusChangedAuto, this, &MainWindow::onStatusChange);
+    connect(poromodo_, &Pomodoro::StatusChangedManual, this, &MainWindow::onStatusChange);
+    connect(poromodo_, &Pomodoro::StatusChangedAuto, this, &MainWindow::onStatusChangedNotification);
 
     // utils
     connect(ui_.log_view, &QTableView::clicked, this, &MainWindow::onLogEntryChange);
@@ -338,7 +338,7 @@ void MainWindow::SettingUpTableView(QTableView* view) {
     view->setSelectionBehavior(QAbstractItemView::SelectRows);
 }
 
-void MainWindow::onStatusChangedNotification(Poromodo::Status s) {
+void MainWindow::onStatusChangedNotification(Pomodoro::Status s) {
     QString status_info = StatusInfo.at(s);
     if (tray_popup_) {
         tray_icon_->showMessage(status_info, status_info);
