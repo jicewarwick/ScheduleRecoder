@@ -17,16 +17,13 @@ endif()
 
 find_package(Qt5 COMPONENTS Core Widgets Sql Multimedia LinguistTools REQUIRED)
 
-set(TS_FILES ${CMAKE_SOURCE_DIR}/translations/main_zh_CN.ts)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/translations)
-set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION "translations")
-qt5_add_translation(QM_FILES ${TS_FILES})
+set(TS_FILES "${CMAKE_SOURCE_DIR}/translations/main_zh_CN.ts")
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/translations")
+qt5_add_translation(QM_FILES "${TS_FILES}")
 
 add_executable(PomodoroScehduleRecorder WIN32
   main.cpp
-  mainwindow.cpp
-  mainwindow.h
-  mainwindow.ui
+  mainwindow.cpp mainwindow.h mainwindow.ui
   resources.qrc
   ${QM_FILES}
 )
@@ -39,8 +36,8 @@ target_link_libraries(Pomodoro PRIVATE Qt5::Core Qt5::Sql)
 target_link_libraries(PomodoroScehduleRecorder PRIVATE Pomodoro HashtagCompleter Qt5::Widgets Qt5::Sql Qt5::Multimedia)
 
 install(TARGETS PomodoroScehduleRecorder RUNTIME DESTINATION bin COMPONENT binary)
-install(FILES ${QM_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/translations COMPONENT language)
-install(FILES LICENCE README.md TYPE DESTINATION doc COMPONENT doc)
+install(FILES "${QM_FILES}" DESTINATION "${CMAKE_INSTALL_PREFIX}/translations" COMPONENT language)
+install(FILES LICENSE README.md TYPE DESTINATION doc COMPONENT doc)
 
 # packing
 set(CPACK_PACKAGE_NAME "PomodoroScheduleRecorder")
