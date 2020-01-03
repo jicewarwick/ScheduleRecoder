@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -37,10 +37,6 @@ void MainWindow::closeEvent(QCloseEvent* event) {
     } else {
         qDebug() << "Hide to tray";
         this->hide();
-        if (hide_to_tray_popup) {
-            hide_to_tray_popup = false;
-            tray_icon_->showMessage(tr("Minimized to Tray"), tr("Working in background!"));
-        }
         event->ignore();
     }
 }
@@ -156,6 +152,8 @@ void MainWindow::onStartPorodomoPorcess() {
 
     ui_.action_pause->setEnabled(true);
     ui_.action_stop->setEnabled(true);
+
+    timer_->stop();
 }
 
 void MainWindow::onStopPorodomoPorcess() {
@@ -179,6 +177,8 @@ void MainWindow::onStopPorodomoPorcess() {
     ui_.action_stop->setEnabled(false);
 
     tray_icon_->setToolTip("Poromodo");
+
+    timer_->start();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -198,6 +198,7 @@ void MainWindow::InitDB() {
     records_model_ = new QSqlTableModel(this, conn);
     records_model_->setTable(kTableName);
     records_model_->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    records_model_->sort(1, Qt::SortOrder::DescendingOrder);
     records_model_->select();
 
     log_model_ = new QSqlTableModel(this, conn);
@@ -249,6 +250,10 @@ void MainWindow::InitGUI() {
     ui_.activity_combo->addItems(activities_);
     hashtag_completer_ = new HashtagCompleter(hashtags_, this);
     ui_.hashtags_lineedit->setCompleter(hashtag_completer_);
+
+    timer_ = new QTimer(this);
+    timer_->setInterval(static_cast<std::chrono::milliseconds>(reminder_interval));
+    timer_->start();
 }
 
 void MainWindow::CreateConnections() {
@@ -261,7 +266,8 @@ void MainWindow::CreateConnections() {
     // other settings
     connect(ui_.sound_effect_checkbox, &QCheckBox::stateChanged, [this](int s) { sound_effect_ = (s == Qt::Checked); });
     connect(ui_.tray_popup_checkbox, &QCheckBox::stateChanged, [this](int s) { tray_popup_ = (s == Qt::Checked); });
-    connect(ui_.start_minimize_checkbox, &QCheckBox::stateChanged, [this](int s) { start_minimized_ = (s == Qt::Checked); });
+    connect(ui_.start_minimize_checkbox, &QCheckBox::stateChanged,
+            [this](int s) { start_minimized_ = (s == Qt::Checked); });
     connect(poromodo_, &Pomodoro::TimeLeftStr, this, &MainWindow::onPoromodoTimeLeftStr);
 
     // menus and buttoms
@@ -282,6 +288,7 @@ void MainWindow::CreateConnections() {
     // utils
     connect(ui_.log_view, &QTableView::clicked, this, &MainWindow::onLogEntryChange);
     connect(ui_.records_view, &QTableView::clicked, this, &MainWindow::onLogEntryChange);
+    connect(timer_, &QTimer::timeout, this, &MainWindow::onReminderPopup);
 }
 
 void MainWindow::ReadSettings() {
@@ -313,8 +320,6 @@ void MainWindow::ReadSettings() {
 
     if (!start_minimized_) {
         show();
-    } else {
-        tray_popup_ = false;
     }
 }
 
@@ -357,3 +362,5 @@ void MainWindow::onLogEntryChange(QModelIndex index) {
         ui_.hashtags_lineedit->setText(record.field("hashtags").value().toString());
     }
 }
+
+void MainWindow::onReminderPopup() { tray_icon_->showMessage(tr("Forget to set activity?"), tr("Set your current activity NOW!")); }

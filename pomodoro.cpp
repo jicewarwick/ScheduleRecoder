@@ -1,4 +1,4 @@
-#include "pomodoro.h"
+﻿#include "pomodoro.h"
 
 #include <QDebug>
 #include <QSqlDatabase>
@@ -82,10 +82,11 @@ void Pomodoro::Stop() {
         set_status_mannual(Status::NONE);
         end_time_ = QDateTime::currentDateTime();
         long long whole_duration_milliseconds = start_time_.msecsTo(end_time_);
-        work_duration_min_= int((whole_duration_milliseconds - pause_duration_milliseconds_) / 60000);
+        work_duration_min_ = int((whole_duration_milliseconds - pause_duration_milliseconds_) / 60000);
         if (work_duration_min_ > minimum_logging_duration_) {
             InsertRecords();
         }
+        poromodo_count_ = 0;
     }
 }
 

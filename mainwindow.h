@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QCloseEvent>
@@ -10,6 +10,7 @@
 #include <QStringListModel>
 #include <QSystemTrayIcon>
 #include <map>
+#include <QTimer>
 
 #include "hashtagcompleter.h"
 #include "pomodoro.h"
@@ -45,6 +46,7 @@ private slots:
     void onStatusChangedNotification(Pomodoro::Status s);
 
     void onLogEntryChange(QModelIndex index);
+    void onReminderPopup();
 
 private:
     Ui::mainwindow ui_;
@@ -54,7 +56,6 @@ private:
     // settings
     bool sound_effect_;
     bool tray_popup_;
-    bool hide_to_tray_popup = true;
     bool start_minimized_;
     QSettings* settings_;
 
@@ -68,6 +69,8 @@ private:
     QSqlTableModel* log_model_;
 
     Pomodoro* poromodo_;
+    QTimer* timer_;
+    minutes reminder_interval{5};
 
     QStringList activities_;
     QStringList categories_;
