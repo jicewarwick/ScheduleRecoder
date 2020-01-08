@@ -341,12 +341,13 @@ void MainWindow::SettingUpTableView(QTableView* view) {
     view->resizeColumnsToContents();
     view->horizontalHeader()->setStretchLastSection(true);
     view->setSelectionBehavior(QAbstractItemView::SelectRows);
+    view->setAlternatingRowColors(true);
 }
 
 void MainWindow::onStatusChangedNotification(Pomodoro::Status s) {
     QString status_info = StatusInfo.at(s);
     if (tray_popup_) {
-        tray_icon_->showMessage(status_info, status_info);
+        tray_icon_->showMessage(status_info, ui_.activity_combo->currentText());
     }
     if (sound_effect_) {
         QSound::play(":/sounds/bell.wav");
