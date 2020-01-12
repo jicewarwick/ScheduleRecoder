@@ -341,6 +341,7 @@ void MainWindow::SettingUpTableView(QTableView* view) {
     view->resizeColumnsToContents();
     view->horizontalHeader()->setStretchLastSection(true);
     view->setSelectionBehavior(QAbstractItemView::SelectRows);
+    view->setAlternatingRowColors(true);
 }
 
 void MainWindow::onStatusChangedNotification(Pomodoro::Status s) {
