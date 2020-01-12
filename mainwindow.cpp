@@ -277,7 +277,7 @@ void MainWindow::CreateConnections() {
     connect(ui_.start_buttom, &QPushButton::pressed, this, &MainWindow::onStartPorodomoPorcess);
     connect(ui_.action_pause, &QAction::triggered, this, &MainWindow::onPuaseUnpause);
     connect(ui_.pause_buttom, &QPushButton::pressed, this, &MainWindow::onPuaseUnpause);
-    connect(ui_.action_stop, &QAction::triggered, poromodo_, &Pomodoro::Stop);
+    connect(ui_.action_stop, &QAction::triggered, this, &MainWindow::onStopPorodomoPorcess);
     connect(ui_.stop_buttom, &QPushButton::pressed, this, &MainWindow::onStopPorodomoPorcess);
 
     // core lib
@@ -346,7 +346,7 @@ void MainWindow::SettingUpTableView(QTableView* view) {
 void MainWindow::onStatusChangedNotification(Pomodoro::Status s) {
     QString status_info = StatusInfo.at(s);
     if (tray_popup_) {
-        tray_icon_->showMessage(status_info, status_info);
+        tray_icon_->showMessage(status_info, ui_.activity_combo->currentText());
     }
     if (sound_effect_) {
         QSound::play(":/sounds/bell.wav");
