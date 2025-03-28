@@ -1,0 +1,62 @@
+repos:
+    - repo: https://gitee.com/ceji/pre-commit-hooks
+      rev: v4.2.0
+      hooks:
+          - id: check-case-conflict
+          - id: check-executables-have-shebangs
+          - id: check-merge-conflict
+          - id: check-shebang-scripts-are-executable
+          - id: check-toml
+          - id: double-quote-string-fixer
+          - id: end-of-file-fixer
+          - id: fix-byte-order-marker
+          - id: mixed-line-ending
+          - id: trailing-whitespace
+    - repo: local
+      hooks:
+          - id: cmake-format
+            name: cmake-format
+            description: cmake-format can format your listfiles nicely so that they don't look like crap.
+            entry: cmake-format
+            args: ['--in-place']
+            language: python
+            types: [cmake]
+          - id: cmake-lint
+            name: cmake-lint
+            description: cmake-lint will check your listfiles for style violations, common mistakes, and anti-patterns.
+            entry: cmake-lint
+            language: python
+            types: [cmake]
+          - id: clang-format
+            name: clang-format
+            description: Format files with ClangFormat.
+            entry: clang-format -i
+            language: system
+            files: \.(c|cc|cxx|cpp|frag|glsl|h|hpp|hxx|ih|ispc|ipp|java|js|m|mm|proto|textproto|vert)$
+            args: ['-fallback-style=none']
+          - id: shellcheck
+            name: shellcheck
+            description: Test shell scripts with shellcheck
+            entry: shellcheck
+            language: python
+            types: [shell]
+            args: ['-s', 'bash', '-x']
+            require_serial: true
+          - id: shfmt
+            name: Check shell style with shfmt
+            language: python
+            entry: shfmt
+            types: [shell]
+            args: ['-l', '-i', '2', '-ci']
+          - id: commitizen
+            name: commitizen check
+            description: >
+                Check whether the current commit message follows commiting rules. Allow
+                empty commit messages by default, because they typically indicate to Git
+                that the commit should be aborted.
+            entry: cz check
+            args: [--allow-abort, --commit-msg-file]
+            stages: [commit-msg]
+            language: python
+            language_version: python3
+            minimum_pre_commit_version: '1.4.3'

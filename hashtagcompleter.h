@@ -5,13 +5,14 @@
 #include <QStringListModel>
 
 class HashtagCompleter : public QCompleter {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    HashtagCompleter(QStringListModel* items, QObject* parent = nullptr) : QCompleter(items, parent) {}
-    ~HashtagCompleter() override = default;
+	HashtagCompleter(QStringListModel* items, QObject* parent = nullptr) : QCompleter(items, parent) {}
 
-    QString pathFromIndex(const QModelIndex& index) const override;
-    QStringList splitPath(const QString& path) const override;
+	~HashtagCompleter() override = default;
+
+	QString pathFromIndex(const QModelIndex& index) const override;
+	QStringList splitPath(const QString& path) const override;
 };
 
 #endif	// HASHTAGCOMPLETER_H
